@@ -69,7 +69,7 @@ def main():
     trainLoader = DRLoader(train_path, arg.windowSize, data_transforms['train'])
     testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'])
     trainSize = trainLoader.__len__()
-    testSize = testLoader.__len()
+    testSize = testLoader.__len__()
     
     model = dVGG(arg.h_dim, num_of_classes)
     
