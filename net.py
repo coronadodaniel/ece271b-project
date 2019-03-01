@@ -151,22 +151,22 @@ def main():
     ##### Start Testing #####
     ##########################        
     test_acc=0.0
-        for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader(arg.batchSize)):
-            if arg.useGPU_f:
-                windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
-                labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
-            else:
-                windowBatch = Variable(windowBatch,requires_grad=True)
-                labelBatch = Variable(labelBatch,requires_grad=False)
+    for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader(arg.batchSize)):
+        if arg.useGPU_f:
+            windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
+            labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
+        else:
+            windowBatch = Variable(windowBatch,requires_grad=True)
+            labelBatch = Variable(labelBatch,requires_grad=False)
 
-            y[:,i],h,dv,s = model(windowBatch,h,dv,s) ## need to append y
-        
-        Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
-        loss = criterion(y,labelBatch)
-        _,pred = torch.max(y,1)
-        test_acc += (pred == labelBatch.data).sum()
-        test_acc = train_acc/testSize
-            
+        y[:,i],h,dv,s = model(windowBatch,h,dv,s) ## need to append y
+
+    Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
+    loss = criterion(y,labelBatch)
+    _,pred = torch.max(y,1)
+    test_acc += (pred == labelBatch.data).sum()
+    test_acc = train_acc/testSize
+
 
 if __name__ == "__main__":
     main()
