@@ -3,11 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
 from torch.autograd import Variable
-
 import torchvision.models as models
-
 import copy
-
 
 def dLSTM(nn.Module):
     def __init__(self, h_dim):

@@ -3,9 +3,10 @@ import imageio
 from PIL import Image
 from tqdm import tqdm
 import numpy as np
+import random
 
 class DRLoader:
-    def __init__(self,root_dir, window_size, transforms):
+    def __init__(self,root_dir, window_size, transforms, shuffle_f):
         assert os.path.exists(root_dir), root_dir+' not exists'
         self.window_size = window_size
         self.transforms = transforms
@@ -24,6 +25,14 @@ class DRLoader:
         self.videos = vid_path
         self.labels = labels
         
+        if shuffle_f:
+            self.shuffle()
+        
+    def shuffle(self):
+        z = zip(self.videos, self.labels)
+        random.shuffle(z)
+        self.videos, self.labels = [list(l) for l in zip(*z)]
+        
     def __len__(self):
         return len(self.videos)
     
@@ -33,7 +42,7 @@ class DRLoader:
             video_batch = self.videos[i:i+batchsize]
             label_batch = self.labels[i:i+batchsize]
             x = torch.zeros(batchsize, self.window_size, 3, 224, 224)
-            y=torch.LongTensor(label_batch)
+            y = torch.LongTensor(label_batch)
             for indx,vid in enumerate(video_batch):
                 F = imageio.get_reader(vid)
                 Frames=[]
