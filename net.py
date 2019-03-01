@@ -96,7 +96,8 @@ def main():
     epochs = arg.epochs if arg.train_f else 0
     for epoch in range(epochs):
         for batchIdx,(windowBatch,labelBatch) in enumerate(trainLoader(arg.batchSize)):
-            y=torch.zeros
+            y=torch.zeros(arg.batchSize, arg.windowSize).type(torch.LongTensor)
+            #Y=torch.LongTensor()
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
                 if arg.useGPU_f:
@@ -107,15 +108,16 @@ def main():
                     labelBatch = Variable(labelBatch,requires_grad=False)
 
 
-                y,h,dv,s = model(windowBatch,h,dv,s) ## need to append y
-                loss = criterion(y,labelBatch)
-                loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
+                y[:,i],h,dv,s = model(windowBatch,h,dv,s) ## need to append y
+            Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
+            loss = criterion(Y,labelBatch)
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
 
-                _,pred = torch.max(y,1) ### prediction should after averging the array
-                train_acc = (pred == labelBatch.data).sum()
-                train_acc = train_acc/batchSize
+            _,pred = torch.max(y,1) ### prediction should after averging the array
+            train_acc = (pred == labelBatch.data).sum()
+            train_acc = train_acc/batchSize
 
             if batchIdx%100==0:
                 logger.info("epochs:{}, train loss:{}, train acc:{}".format(epoch, loss.data.cpu(), train_acc))
@@ -132,11 +134,12 @@ def main():
                 windowBatch = Variable(windowBatch,requires_grad=True)
                 labelBatch = Variable(labelBatch,requires_grad=False)
 
-            y,h,dv,s = model(windowBatch,h,dv,s)
-            loss = criterion(y,labelBatch)
-
-            _,pred = torch.max(y,1)
-            val_acc += (pred == labelBatch.data).sum()
+            y[:,i],h,dv,s = model(windowBatch,h,dv,s)
+        
+        Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
+        loss = criterion(Y,labelBatch)
+        _,pred = torch.max(Y,1)
+        val_acc += (pred == labelBatch.data).sum()
         val_acc = train_acc/testSize
         logger.info("==> val loss:{}, val acc:{}".format(val_acc,loss))
         
@@ -156,11 +159,12 @@ def main():
                 windowBatch = Variable(windowBatch,requires_grad=True)
                 labelBatch = Variable(labelBatch,requires_grad=False)
 
-            y,h,dv,s = model(windowBatch,h,dv,s)
-            loss = criterion(y,labelBatch)
-
-            _,pred = torch.max(y,1)
-            test_acc += (pred == labelBatch.data).sum()
+            y[:,i],h,dv,s = model(windowBatch,h,dv,s) ## need to append y
+        
+        Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
+        loss = criterion(y,labelBatch)
+        _,pred = torch.max(y,1)
+        test_acc += (pred == labelBatch.data).sum()
         test_acc = train_acc/testSize
             
 
