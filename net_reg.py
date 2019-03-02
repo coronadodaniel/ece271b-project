@@ -166,11 +166,12 @@ def main():
                 labelBatch = Variable(labelBatch,requires_grad=False)
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,h,dv,s = model(imgBatch,h,dv,s)
-                h,dv,s = h.detach(), dv.detach(), s.detach()
+                temp,(h,c) = model(imgBatch,(h,c))
+                h = h.detach()
+                c = c.detach()
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
-                y += temp
+                y += torch.squeeze(temp)
 
             Y=y/arg.windowSize
             loss = criterion(Y,labelBatch)
@@ -211,7 +212,6 @@ def main():
 
 
 
-
         for i in range(arg.windowSize):
             imgBatch = windowBatch[:,i,:,:,:]
             temp,h,dv,s = model(imgBatch,h,dv,s)
@@ -219,6 +219,7 @@ def main():
             #loss_ = criterion(temp,labelBatch)
             #loss+=loss_.data
             y += temp
+
 
         Y=y/arg.windowSize
         loss = criterion(Y,labelBatch)
