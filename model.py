@@ -56,8 +56,7 @@ class VGG(nn.Module):
 
     def forward(self,x,h):
         f = self.model(x)
-        print(f.shape)
         o,h = self.LSTM_net(torch.unsqueeze(f,0),h)
-        y = self.classifier(h)
+        y = self.classifier(h[1])
         #print('y',y.shape,'h', h.shape)
         return y, h

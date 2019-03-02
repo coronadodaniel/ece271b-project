@@ -123,13 +123,11 @@ def main():
 
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                print(h[0].shape)
-                print(imgBatch.shape)
                 temp,h = model(imgBatch,h)
-                h = h.detach()
+                #h = h.detach()
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
-                y += temp
+                y += torch.squeeze(temp)
 
             Y=y/arg.windowSize
             #loss = Variable(loss.cuda(),requires_grad=True)
