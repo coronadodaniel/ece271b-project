@@ -96,9 +96,13 @@ def main():
     optimizer.zero_grad()
 
     if arg.useGPU_f:
-        h=(Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False),Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False))
+        #h=(Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False),Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False))
+        h = Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(), requires_grad=False)
+        c = Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(), requires_grad=False)
     else:
-        h=(Variable(torch.randn(1,arg.batchSize,arg.h_dim)),Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False))
+        #h=(Variable(torch.randn(1,arg.batchSize,arg.h_dim)),Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False))
+        h = Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False)
+        c = Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False)
 
     min_acc=0.0
     ##########################
@@ -123,8 +127,9 @@ def main():
 
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,h = model(imgBatch,h)
-                #h = h.detach()
+                temp,(h,c) = model(imgBatch,(h,c))
+                h = h.detach()
+                c = c.detach()
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
                 y += torch.squeeze(temp)
@@ -132,8 +137,8 @@ def main():
             Y=y/arg.windowSize
             #loss = Variable(loss.cuda(),requires_grad=True)
             loss = criterion(Y, labelBatch)
-            #loss.backward(retain_graph=True)
-            loss.backward()
+            loss.backward(retain_graph=True)
+            #loss.backward()
             optimizer.step()
             optimizer.zero_grad()
 
