@@ -18,13 +18,14 @@ class dLSTM(nn.Module):
         self.g = nn.Sequential(nn.Linear(in_dim+h_dim,h_dim), nn.Tanh())
 
     def forward(self,x,h,dv,s):
-        i = self.i(torch.cat([x,h,dv]))
-        f = self.f(torch.cat([x,h,dv]))
-        g = self.g(torch.cat([x,h]))
-        o = self.o(torch.cat([x,h,dv]))
+        #print(x.shape, h.shape, dv.shape)
+        i = self.i(torch.cat([x,h,dv],1))
+        f = self.f(torch.cat([x,h,dv],1))
+        g = self.g(torch.cat([x,h],1))
+        o = self.o(torch.cat([x,h,dv],1))
 
         s_ = torch.add(torch.mul(f,s),torch.mul(i,g))
-        h = torch.mul(o,F.tanh(s_))
+        h = torch.mul(o,torch.tanh(s_))
         dv = s_-s
         return h, dv, s_
 
@@ -35,11 +36,12 @@ class dVGG(nn.Module):
         self.model = models.vgg16(pretrained=True)
         self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-3])
         self.classifier = nn.Linear(h_dim,num_of_classes)
-        self.dLSTM_net = dLSTM(h_dim)
+        self.dLSTM = dLSTM(h_dim)
 
     def forward(self,x,h,dv,s):
         f = self.model(x)
-        h,dv,s = self.dLSTM_net(f,h,dv,s)
+        h,dv,s = self.dLSTM(f,h,dv,s)
         y = self.classifier(h)
+        #print('y',y.shape,'h', h.shape)
         return y, h, dv, s
 

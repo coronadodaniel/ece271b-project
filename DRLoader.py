@@ -5,6 +5,7 @@ from PIL import Image
 from tqdm import tqdm
 import numpy as np
 import random
+import torch
 
 
 
@@ -51,12 +52,14 @@ class DRLoader:
                 Frames=[]
                 for f in F:
                     Frames.append(f)
+                #F.close()
                 n=len(Frames)
                 if n>self.window_size:
                     rnd_idx = int((n-self.window_size)*np.random.rand())
                     frames=Frames[rnd_idx:rnd_idx+self.window_size]
                 else:
                     frames=Frames
+                    print('frames',len(frames))
                 Window=None
                 for img in frames:
                     img = self.transforms(Image.fromarray(img))
