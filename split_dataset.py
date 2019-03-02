@@ -1,9 +1,19 @@
 import os
 import imageio
 import shutil
+import patoolib
 import imageio
 
 if __name__ == "__main__":
+
+
+    if not os.path.exists("UCF11_updated_mpg.rar"):
+        u = "http://crcv.ucf.edu/data/UCF11_updated_mpg.rar"
+        urllib.request.urlretrieve (u, "UCF11_updated_mpg.rar")
+
+    if not os.path.exists("UCF11_updated_mpg"):
+        patoolib.extract_archive("UCF11_updated_mpg.rar", outdir='.')
+
     root='UCF11_updated_mpg'
     classes=sorted(os.listdir(root))
 
@@ -30,13 +40,13 @@ if __name__ == "__main__":
                 continue
             if i<(0.8*n):
                 videos = sorted(os.listdir(root+'/'+c+'/'+subclass))
-                for video in videos: 
+                for video in videos:
                     src_dir = root+'/'+c+'/'+subclass+'/'+video
                     dst_dir = train_path+'/'+c+'/'+video
                     shutil.copy(src_dir,dst_dir)
             else:
                 videos = sorted(os.listdir(root+'/'+c+'/'+subclass))
-                for video in videos: 
+                for video in videos:
                     src_dir = root+'/'+c+'/'+subclass+'/'+video
                     dst_dir = test_path+'/'+c+'/'+video
                     shutil.copy(src_dir,dst_dir)
