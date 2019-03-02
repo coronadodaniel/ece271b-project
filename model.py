@@ -44,4 +44,23 @@ class dVGG(nn.Module):
         y = self.classifier(h)
         #print('y',y.shape,'h', h.shape)
         return y, h, dv, s
+
+class VGG(nn.Module):
+    def __init__(self, h_dim,num_of_classes):
+        super(VGG, self).__init__()
+        
+        self.model = models.vgg16(pretrained=True)
+        self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-3])
+        self.classifier = nn.Linear(h_dim,num_of_classes)
+        self.LSTM = nn.LSTM(4096,h_dim)
+        self.num_of_classes = num_of_classes
+        
+    def forward(self,x,hidden):
+        f = self.model(x)
+        f = f.view(1,-1,4096)
+        out,hidden = self.LSTM(f,hidden)
+        y = self.classifier(out)
+        y=y.view(-1,self.num_of_classes)
+        #print('y',y.shape,'h', h.shape)
+        return y, hidden
         

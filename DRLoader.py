@@ -55,8 +55,7 @@ class DRLoader:
                     rnd_idx = int((n-self.window_size)*np.random.rand())
                     frames=Frames[rnd_idx:rnd_idx+self.window_size]
                 else:
-                    frames=Frames
-                    print('frames',len(frames))
+                    continue
                 Window=None
                 for img in frames:
                     img = self.transforms(Image.fromarray(img))

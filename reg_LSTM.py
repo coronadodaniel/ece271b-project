@@ -17,7 +17,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
 
-from model import dVGG
+from model import VGG
 from DRLoader import DRLoader
 
 parser = argparse.ArgumentParser(description='PyTorch Training')
@@ -40,11 +40,11 @@ def main():
         os.makedirs('model')
     if not os.path.exists('log'):
         os.makedirs('log')
-    model_path = 'model/model_dLSTM.pt'
+    model_path = 'model/model_LSTM.pt'
     
     logger = logging.getLogger('netlog')
     logger.setLevel(logging.INFO)
-    ch = logging.FileHandler('log/logfile_dLSTM.log')
+    ch = logging.FileHandler('log/logfile_LSTM.log')
     ch.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
@@ -80,7 +80,7 @@ def main():
     trainSize = trainLoader.__len__()
     testSize = testLoader.__len__()
     
-    model = dVGG(arg.h_dim, num_of_classes)
+    model = VGG(arg.h_dim, num_of_classes)
     
     if arg.useGPU_f:
         model.cuda()
@@ -88,15 +88,14 @@ def main():
     optimizer = optim.Adam(model.parameters(),lr=arg.lr)
     criterion = nn.CrossEntropyLoss()
     optimizer.zero_grad()
-    
+    hidden = ( Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False),
+               Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False))
     if arg.useGPU_f:
-        s=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
-        h=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
-        dv=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
+        hidden = ( Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False),
+                   Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False))
     else:
-        s=Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False)
-        h=Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False)
-        dv=Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False)
+        hidden = ( Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False),
+                   Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False))
      
     min_acc=0.0
     ##########################
@@ -111,18 +110,17 @@ def main():
             #loss=0.0
             y=torch.zeros(arg.batchSize, num_of_classes).cuda()
             if arg.useGPU_f:
-                y=torch.zeros(arg.batchSize, num_of_classes).cuda()
                 windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
                 labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
             else:
-                y=torch.zeros(arg.batchSize, num_of_classes)
                 windowBatch = Variable(windowBatch,requires_grad=True)
                 labelBatch = Variable(labelBatch,requires_grad=False)
             
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,h,dv,s = model(imgBatch,h,dv,s)
-                h,dv,s = h.detach(), dv.detach(), s.detach()
+                temp,hidden = model(imgBatch,hidden)
+                (h,c) = hidden
+                hidden = (h.detach(), c.detach())
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
                 y += temp
@@ -150,17 +148,16 @@ def main():
         for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader.batches(arg.batchSize)):
             y=torch.zeros(arg.batchSize, num_of_classes)
             if arg.useGPU_f:
-                y=torch.zeros(arg.batchSize, num_of_classes).cuda()
                 windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
                 labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
             else:
-                y=torch.zeros(arg.batchSize, num_of_classes)
                 windowBatch = Variable(windowBatch,requires_grad=True)
                 labelBatch = Variable(labelBatch,requires_grad=False)
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,h,dv,s = model(imgBatch,h,dv,s)
-                h,dv,s = h.detach(), dv.detach(), s.detach()
+                temp,hidden = model(imgBatch,hidden)
+                (h,c) = hidden
+                hidden = (h.detach(), c.detach())
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
                 y += temp
@@ -169,9 +166,10 @@ def main():
             loss = criterion(Y,labelBatch)
 
             _,pred = torch.max(Y,1)
-            val_acc += (pred == labelBatch.data).sum()
-            
-        val_acc = 100.0*val_acc.data.cpu().numpy()/testSize
+            val_acc = (pred == labelBatch.data).sum()
+            val_acc = 100.0*val_acc.data.cpu().numpy()/arg.batchSize
+
+
         logger.info("==> val loss:{}, val acc:{}".format(val_acc,loss.data.cpu().numpy()))
         
         if val_acc>min_cc:
@@ -198,8 +196,9 @@ def main():
         
         for i in range(arg.windowSize):
             imgBatch = windowBatch[:,i,:,:,:]
-            temp,h,dv,s = model(imgBatch,h,dv,s)
-            h,dv,s = h.detach(), dv.detach(), s.detach()
+            temp,hidden = model(imgBatch,hidden)
+            (h,c) = hidden
+            hidden = (h.detach(), c.detach())
             #loss_ = criterion(temp,labelBatch)
             #loss+=loss_.data
             y += temp
