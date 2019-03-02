@@ -32,9 +32,11 @@ def main():
     if not os.path.exists('model'):
         os.makedirs('model')
     model_path = 'model/model_dLSTM.pt'
-    
+
     logger = logging.getLogger('netlog')
     logger.setLevel(logging.INFO)
+    if not os.path.exists('log'):
+        os.makedirs('log')
     ch = logging.FileHandler('log/logfile_dLSTM.log')
     ch.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -46,7 +48,7 @@ def main():
     logger.info("Batch Size: {}".format(arg.batchSize))
     logger.info("Window Size: {}".format(arg.windowSize))
     logger.info("Hidden Layer Dimension: {}".format(arg.h_dim))
-    
+
     data_transforms = {
         'train': transforms.Compose([
             transforms.RandomResizedCrop(224,scale=(0.6,1.0)),
@@ -60,26 +62,26 @@ def main():
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
     }
-    
+
     root_dir = 'UCF11_split'
     train_path = root_dir+'/train'
     test_path = root_dir+'/test'
     num_of_classes=11
-    
-    trainLoader = DRLoader(train_path, arg.windowSize, data_transforms['train'])
-    testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'])
+
+    trainLoader = DRLoader(train_path, arg.windowSize, data_transforms['train'], True)
+    testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'], False)
     trainSize = trainLoader.__len__()
     testSize = testLoader.__len__()
-    
+
     model = dVGG(arg.h_dim, num_of_classes)
-    
+
     if arg.useGPU_f:
         model.cuda()
-    
+
     optimizer = optim.Adam(model.parameters(),lr=arg.lr)
     criterion = nn.CrossEntropyLoss()
     optimizer.zero_grad()
-    
+
     if arg.useGPU_f:
         s=Variable(torch.zeros(arg.batchSize,arg.windowSize).cuda(),requires_grad=False)
         h=Variable(torch.zeros(arg.batchSize,arg.windowSize).cuda(),requires_grad=False)
@@ -88,7 +90,7 @@ def main():
         s=Variable(torch.zeros(arg.batchSize,arg.windowSize),requires_grad=False)
         h=Variable(torch.zeros(arg.batchSize,arg.windowSize),requires_grad=False)
         dv=Variable(torch.zeros(arg.batchSize,arg.windowSize),requires_grad=False)
-     
+
     min_acc=0.0
     ##########################
     ##### Start Training #####
@@ -121,7 +123,7 @@ def main():
 
             if batchIdx%100==0:
                 logger.info("epochs:{}, train loss:{}, train acc:{}".format(epoch, loss.data.cpu(), train_acc))
-        
+
         ########################
         ### Start Validation ###
         ########################
@@ -135,21 +137,21 @@ def main():
                 labelBatch = Variable(labelBatch,requires_grad=False)
 
             y[:,i],h,dv,s = model(windowBatch,h,dv,s)
-        
+
         Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
         loss = criterion(Y,labelBatch)
         _,pred = torch.max(Y,1)
         val_acc += (pred == labelBatch.data).sum()
         val_acc = train_acc/testSize
         logger.info("==> val loss:{}, val acc:{}".format(val_acc,loss))
-        
+
         if val_acc>min_cc:
             min_acc=val_acc
             torch.save(model.state_dict(), model_path)
-            
+
     ##########################
     ##### Start Testing #####
-    ##########################        
+    ##########################
     test_acc=0.0
     for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader(arg.batchSize)):
         if arg.useGPU_f:
