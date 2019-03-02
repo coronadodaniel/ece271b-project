@@ -9,6 +9,8 @@ import logging
 import torchvision.models as models
 import torchvision.transforms as transforms
 
+import torch
+import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torch.cuda as cuda
 import torch.optim as optim
@@ -19,6 +21,7 @@ from model import dVGG
 from DRLoader import DRLoader
 
 parser = argparse.ArgumentParser(description='PyTorch Training')
+
 parser.add_argument('-e', '--epochs', action='store', default=20, type=int, help='epochs (default: 20)')
 parser.add_argument('--batchSize', action='store', default=128, type=int, help='batch size (default: 128)')
 parser.add_argument('--windowSize', action='store', default=25, type=int, help='number of frames (default: 25)')
@@ -26,11 +29,17 @@ parser.add_argument('--h_dim', action='store', default=256, type=int, help='LSTM
 parser.add_argument('--lr','--learning-rate',action='store',default=0.01, type=float,help='learning rate (default: 0.01)')
 parser.add_argument('--train_f', action='store_false', default=True, help='Flag to train (STORE_FALSE)(default: True)')
 parser.add_argument('--useGPU_f', action='store_false', default=True, help='Flag to use GPU (STORE_FALSE)(default: True)')
+parser.add_argument('--gpu_num', action='store', default=0, type=int, help='gpu_num (default: 0)')
 arg = parser.parse_args()
 
 def main():
+    torch.cuda.set_device(arg.gpu_num)
+    torch.cuda.current_device()
+    
     if not os.path.exists('model'):
         os.makedirs('model')
+    if not os.path.exists('log'):
+        os.makedirs('log')
     model_path = 'model/model_dLSTM.pt'
     
     logger = logging.getLogger('netlog')
@@ -66,8 +75,8 @@ def main():
     test_path = root_dir+'/test'
     num_of_classes=11
     
-    trainLoader = DRLoader(train_path, arg.windowSize, data_transforms['train'])
-    testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'])
+    trainLoader = DRLoader(train_path, arg.windowSize, data_transforms['train'], True)
+    testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'], False)
     trainSize = trainLoader.__len__()
     testSize = testLoader.__len__()
     
@@ -81,43 +90,51 @@ def main():
     optimizer.zero_grad()
     
     if arg.useGPU_f:
-        s=Variable(torch.zeros(arg.batchSize,arg.windowSize).cuda(),requires_grad=False)
-        h=Variable(torch.zeros(arg.batchSize,arg.windowSize).cuda(),requires_grad=False)
-        dv=Variable(torch.zeros(arg.batchSize,arg.windowSize).cuda(),requires_grad=False)
+        s=Variable(torch.zeros(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
+        h=Variable(torch.zeros(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
+        dv=Variable(torch.zeros(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
     else:
-        s=Variable(torch.zeros(arg.batchSize,arg.windowSize),requires_grad=False)
-        h=Variable(torch.zeros(arg.batchSize,arg.windowSize),requires_grad=False)
-        dv=Variable(torch.zeros(arg.batchSize,arg.windowSize),requires_grad=False)
+        s=Variable(torch.zeros(arg.batchSize,arg.h_dim),requires_grad=False)
+        h=Variable(torch.zeros(arg.batchSize,arg.h_dim),requires_grad=False)
+        dv=Variable(torch.zeros(arg.batchSize,arg.h_dim),requires_grad=False)
      
     min_acc=0.0
     ##########################
     ##### Start Training #####
     ##########################
+    torch.no_grad() #####
     epochs = arg.epochs if arg.train_f else 0
     for epoch in range(epochs):
-        for batchIdx,(windowBatch,labelBatch) in enumerate(trainLoader(arg.batchSize)):
-            y=torch.zeros(arg.batchSize, arg.windowSize).type(torch.LongTensor)
-            #Y=torch.LongTensor()
+        model.train()
+        optimizer.zero_grad()
+        for batchIdx,(windowBatch,labelBatch) in enumerate(trainLoader.batches(arg.batchSize)):
+            print(1)
+            loss=0.0
+            y=torch.zeros(arg.batchSize, num_of_classes).cuda()
+            if arg.useGPU_f:
+                windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
+                labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
+            else:
+                windowBatch = Variable(windowBatch,requires_grad=True)
+                labelBatch = Variable(labelBatch,requires_grad=False)
+            
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                if arg.useGPU_f:
-                    imgBatch = Variable(imgBatch.cuda(),requires_grad=True)
-                    labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
-                else:
-                    imgBatch = Variable(imgBatch,requires_grad=True)
-                    labelBatch = Variable(labelBatch,requires_grad=False)
-
-
-                y[:,i],h,dv,s = model(windowBatch,h,dv,s) ## need to append y
-            Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
-            loss = criterion(Y,labelBatch)
-            loss.backward()
+                temp,h,dv,s = model(imgBatch,h,dv,s)
+                h,dv,s = h.detach(), dv.detach(), s.detach()
+                loss_ = criterion(temp,labelBatch)
+                loss+=loss_.data
+                y += temp
+            
+            Y=y/arg.windowSize
+            loss = Variable(loss.cuda(),requires_grad=True)
+            loss.backward(retain_graph=True)
             optimizer.step()
             optimizer.zero_grad()
 
-            _,pred = torch.max(y,1) ### prediction should after averging the array
+            _,pred = torch.max(Y,1) ### prediction should after averging the array
             train_acc = (pred == labelBatch.data).sum()
-            train_acc = train_acc/batchSize
+            train_acc = train_acc.data.cpu().numpy()/arg.batchSize
 
             if batchIdx%100==0:
                 logger.info("epochs:{}, train loss:{}, train acc:{}".format(epoch, loss.data.cpu(), train_acc))
@@ -125,22 +142,32 @@ def main():
         ########################
         ### Start Validation ###
         ########################
+        model.eval()
         val_acc=0.0
-        for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader(arg.batchSize)):
+        for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader.batches(arg.batchSize)):
+            y=torch.zeros(arg.batchSize, num_of_classes)
             if arg.useGPU_f:
                 windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
                 labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
             else:
                 windowBatch = Variable(windowBatch,requires_grad=True)
                 labelBatch = Variable(labelBatch,requires_grad=False)
+            for i in range(arg.windowSize):
+                imgBatch = windowBatch[:,i,:,:,:]
+                temp,h,dv,s = model(imgBatch,h,dv,s)
+                h,dv,s = h.detach(), dv.detach(), s.detach()
+                loss_ = criterion(temp,labelBatch)
+                loss+=loss_.data
+                y += temp
+            
+            Y=y/arg.windowSize
+            loss = criterion(Y,labelBatch)
 
-            y[:,i],h,dv,s = model(windowBatch,h,dv,s)
-        
-        Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
-        loss = criterion(Y,labelBatch)
-        _,pred = torch.max(Y,1)
-        val_acc += (pred == labelBatch.data).sum()
-        val_acc = train_acc/testSize
+            _,pred = torch.max(Y,1)
+            val_acc = (pred == labelBatch.data).sum()
+            val_acc = val_acc.data.cpu().numpy()/arg.batchSize
+
+
         logger.info("==> val loss:{}, val acc:{}".format(val_acc,loss))
         
         if val_acc>min_cc:
@@ -149,23 +176,36 @@ def main():
             
     ##########################
     ##### Start Testing #####
-    ##########################        
+    ##########################   
+    model.eval()
+    torch.no_grad()
     test_acc=0.0
-    for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader(arg.batchSize)):
+    if os.path.isfile(model_path):
+        model.load_state_dict(torch.load(model_path))
+        
+    for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader.batches(arg.batchSize)):
+        y=torch.zeros(arg.batchSize, num_of_classes)
         if arg.useGPU_f:
             windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
             labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
         else:
             windowBatch = Variable(windowBatch,requires_grad=True)
             labelBatch = Variable(labelBatch,requires_grad=False)
+        
+        for i in range(arg.windowSize):
+            imgBatch = windowBatch[:,i,:,:,:]
+            temp,h,dv,s = model(imgBatch,h,dv,s)
+            h,dv,s = h.detach(), dv.detach(), s.detach()
+            loss_ = criterion(temp,labelBatch)
+            loss+=loss_.data
+            y += temp
 
-        y[:,i],h,dv,s = model(windowBatch,h,dv,s) ## need to append y
-
-    Y = torch.mean(y.type(torch.FloatTensor),1).type(torch.LongTensor)
-    loss = criterion(y,labelBatch)
-    _,pred = torch.max(y,1)
-    test_acc += (pred == labelBatch.data).sum()
-    test_acc = train_acc/testSize
+        Y=y/arg.windowSize
+        _,pred = torch.max(y,1)
+        test_acc += (pred == labelBatch.data).sum()
+    test_acc = train_acc.data.cpu().numpy()/testSize
+    
+    logger.info("==> test loss:{}, test acc:{}".format(val_acc,loss))
 
 
 if __name__ == "__main__":
