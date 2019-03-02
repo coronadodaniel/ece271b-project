@@ -5,6 +5,7 @@ import pickle
 import random
 import argparse
 import logging
+import imageio
 
 import torchvision.models as models
 import torchvision.transforms as transforms
@@ -14,9 +15,12 @@ import torch.cuda as cuda
 import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
+from torch import nn
 
 from model import dVGG
 from DRLoader import DRLoader
+
+imageio.plugins.ffmpeg.download()
 
 parser = argparse.ArgumentParser(description='PyTorch Training')
 parser.add_argument('-e', '--epochs', action='store', default=20, type=int, help='epochs (default: 20)')
@@ -97,7 +101,9 @@ def main():
     ##########################
     epochs = arg.epochs if arg.train_f else 0
     for epoch in range(epochs):
-        for batchIdx,(windowBatch,labelBatch) in enumerate(trainLoader(arg.batchSize)):
+
+        for batchIdx,(windowBatch,labelBatch) in enumerate(trainLoader.batches(arg.batchSize)):
+            print("[%d/%d]" % (epoch, batchIdx))
             y=torch.zeros(arg.batchSize, arg.windowSize).type(torch.LongTensor)
             #Y=torch.LongTensor()
             for i in range(arg.windowSize):

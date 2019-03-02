@@ -35,11 +35,11 @@ class dVGG(nn.Module):
         self.model = models.vgg16(pretrained=True)
         self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-3])
         self.classifier = nn.Linear(h_dim,num_of_classes)
-        dLSTM = dLSTM(h_dim)
+        self.dLSTM_net = dLSTM(h_dim)
 
     def forward(self,x,h,dv,s):
         f = self.model(x)
-        h,dv,s = dLSTM(f,h,dv,s)
+        h,dv,s = self.dLSTM_net(f,h,dv,s)
         y = self.classifier(h)
         return y, h, dv, s
 

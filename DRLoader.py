@@ -1,16 +1,19 @@
 import os
+import torch
 import imageio
 from PIL import Image
 from tqdm import tqdm
 import numpy as np
 import random
 
+
+
 class DRLoader:
     def __init__(self,root_dir, window_size, transforms, shuffle_f):
         assert os.path.exists(root_dir), root_dir+' not exists'
         self.window_size = window_size
         self.transforms = transforms
-        
+
         classes = sorted(os.listdir(root_dir))
         vid_path,labels=[],[]
         for i,c in enumerate(classes):
@@ -21,21 +24,21 @@ class DRLoader:
                     continue
                 vid_path.append(os.path.join(root_dir,c,vid))
                 labels.append(i)
-                
+
         self.videos = vid_path
         self.labels = labels
-        
+
         if shuffle_f:
             self.shuffle()
-        
+
     def shuffle(self):
-        z = zip(self.videos, self.labels)
+        z = list(zip(self.videos, self.labels))
         random.shuffle(z)
         self.videos, self.labels = [list(l) for l in zip(*z)]
-        
+
     def __len__(self):
         return len(self.videos)
-    
+
     def batches(self,batchsize):
         n = len(self.videos)
         for i in range(0,n-batchsize,batchsize):
@@ -63,5 +66,5 @@ class DRLoader:
                     else:
                         Window=torch.cat([Window,img],0)
                 x[indx] = Window
-            
+
             yield x,y
