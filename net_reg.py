@@ -44,13 +44,13 @@ def main():
         os.makedirs('model')
     if not os.path.exists('log'):
         os.makedirs('log')
-    model_path = 'model/model_dLSTM.pt'
+    model_path = 'model/model_LSTM.pt'
 
     logger = logging.getLogger('netlog')
     logger.setLevel(logging.INFO)
     if not os.path.exists('log'):
         os.makedirs('log')
-    ch = logging.FileHandler('log/logfile_dLSTM.log')
+    ch = logging.FileHandler('log/logfile_LSTM.log')
     ch.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
