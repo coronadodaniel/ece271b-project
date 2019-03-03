@@ -20,6 +20,10 @@ from torch.utils.data import Dataset, DataLoader
 from model import dVGG
 from DRLoader import DRLoader
 
+import matplotlib.pyplot as plt
+
+plt.switch_backend('agg')
+
 parser = argparse.ArgumentParser(description='PyTorch Training')
 
 parser.add_argument('-e', '--epochs', action='store', default=20, type=int, help='epochs (default: 20)')
@@ -35,13 +39,13 @@ arg = parser.parse_args()
 def main():
     if len(arg.gpu_num)==1:
         torch.cuda.set_device(arg.gpu_num[0])
-    
+
     if not os.path.exists('model'):
         os.makedirs('model')
     if not os.path.exists('log'):
         os.makedirs('log')
     model_path = 'model/model_dLSTM.pt'
-    
+
     logger = logging.getLogger('netlog')
     logger.setLevel(logging.INFO)
     ch = logging.FileHandler('log/logfile_dLSTM.log')
@@ -55,7 +59,7 @@ def main():
     logger.info("Batch Size: {}".format(arg.batchSize))
     logger.info("Window Size: {}".format(arg.windowSize))
     logger.info("Hidden Layer Dimension: {}".format(arg.h_dim))
-    
+
     data_transforms = {
         'train': transforms.Compose([
             transforms.RandomResizedCrop(224,scale=(0.6,1.0)),
@@ -69,28 +73,28 @@ def main():
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
     }
-    
+
     root_dir = 'UCF11_split'
     train_path = root_dir+'/train'
     test_path = root_dir+'/test'
     num_of_classes=11
-    
+
     trainLoader = DRLoader(train_path, arg.windowSize, data_transforms['train'], True)
     testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'], False)
     trainSize = trainLoader.__len__()
     testSize = testLoader.__len__()
-    
+
     model = dVGG(arg.h_dim, num_of_classes)
-    
+
     if arg.useGPU_f:
         if len(arg.gpu_num)>1:
             model = nn.DataParallel(model,arg.gpu_num)
         model.cuda()
-    
+
     optimizer = optim.Adam(model.parameters(),lr=arg.lr)
     criterion = nn.CrossEntropyLoss()
     optimizer.zero_grad()
-    
+
     if arg.useGPU_f:
         s=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
         h=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
@@ -103,7 +107,11 @@ def main():
         dv=Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False)
         hidden = ( Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False),
                    Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False))
-     
+
+    train_loss_plot = []
+    train_acc_plot = []
+    test_loss_plot = []
+    test_acc_plot = []
     min_acc=0.0
     ##########################
     ##### Start Training #####
@@ -113,6 +121,9 @@ def main():
     for epoch in range(epochs):
         model.train()
         optimizer.zero_grad()
+        train_loss = 0
+        train_acc = 0
+        train_size = 0
         for batchIdx,(windowBatch,labelBatch) in enumerate(trainLoader.batches(arg.batchSize)):
             #loss=0.0
             if arg.useGPU_f:
@@ -123,7 +134,7 @@ def main():
                 y=torch.zeros(arg.batchSize, num_of_classes)
                 windowBatch = Variable(windowBatch,requires_grad=True)
                 labelBatch = Variable(labelBatch,requires_grad=False)
-            
+
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
                 temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
@@ -133,27 +144,39 @@ def main():
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
                 y += temp
-            
+
             Y=y/arg.windowSize
             #loss = Variable(loss.cuda(),requires_grad=True)
             loss = criterion(Y,labelBatch)
             loss.backward()
+            train_loss += loss.item()
             optimizer.step()
             optimizer.zero_grad()
 
             _,pred = torch.max(Y,1) ### prediction should after averging the array
-            train_acc = (pred == labelBatch.data).sum()
-            train_acc = 100.0*train_acc.data.cpu().numpy()/arg.batchSize
+            train_acc += (pred == labelBatch.data).sum()
+            #train_acc = 100.0*train_acc.data.cpu().numpy()/arg.batchSize
             #print('train acc', train_acc, 'train loss', loss.data.cpu())
+            train_size += arg.batchSize
 
             if batchIdx%100==0:
-                logger.info("epochs:{}, batchIdx:{}, train loss:{}, train acc:{}".format(epoch, batchIdx loss.data.cpu(), train_acc))
-        
+                logger.info("epochs:{}, batchIdx:{}, train loss:{}".format(epoch, batchIdx, loss.data.cpu()))
+
+        train_loss = train_loss / train_size
+        train_acc = train_acc.data.cpu().numpy() / train_size
+
+        train_loss_plot.append(train_loss)
+        train_acc_plot.append(train_acc)
+
+
+
         ########################
         ### Start Validation ###
         ########################
         model.eval()
         val_acc=0.0
+        val_loss=0
+        val_size= 0
         for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader.batches(arg.batchSize)):
             if arg.useGPU_f:
                 y=torch.zeros(arg.batchSize, num_of_classes).cuda()
@@ -172,29 +195,37 @@ def main():
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
                 y += temp
-            
+
             Y=y/arg.windowSize
             loss = criterion(Y,labelBatch)
+            val_loss += loss.item()
 
             _,pred = torch.max(Y,1)
             val_acc += (pred == labelBatch.data).sum()
-            
-        val_acc = 100.0*val_acc.data.cpu().numpy()/testSize
-        logger.info("==> val loss:{}, val acc:{}".format(val_acc,loss.data.cpu().numpy()))
-        
+            val_size += arg.batchSize
+
+        val_acc = val_acc.data.cpu().numpy()/ val_size
+        val_loss = val_loss / val_size
+        logger.info("==> val loss:{}, val acc:{}".format(val_loss,val_acc))
+
+        test_loss_plot.append(val_loss)
+        test_acc_plot.append(val_acc)
+
         if val_acc>min_acc:
             min_acc=val_acc
             torch.save(model.state_dict(), model_path)
-            
+
     ##########################
     ##### Start Testing #####
-    ##########################   
+    ##########################
     model.eval()
     torch.no_grad()
     test_acc=0.0
     if os.path.isfile(model_path):
         model.load_state_dict(torch.load(model_path))
-        
+
+    test_loss = 0
+    test_size = 0
     for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader.batches(arg.batchSize)):
         y=torch.zeros(arg.batchSize, num_of_classes)
         if arg.useGPU_f:
@@ -205,7 +236,7 @@ def main():
             y=torch.zeros(arg.batchSize, num_of_classes)
             windowBatch = Variable(windowBatch,requires_grad=True)
             labelBatch = Variable(labelBatch,requires_grad=False)
-        
+
         for i in range(arg.windowSize):
             imgBatch = windowBatch[:,i,:,:,:]
             temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
@@ -218,11 +249,34 @@ def main():
 
         Y=y/arg.windowSize
         loss = criterion(Y,labelBatch)
+        test_loss += loss.item()
         _,pred = torch.max(y,1)
         test_acc += (pred == labelBatch.data).sum()
-    test_acc = 100.0*train_acc.data.cpu().numpy()/testSize
-    
-    logger.info("==> test loss:{}, test acc:{}".format(test_acc,loss.data.cpu().numpy()))
+        test_size += arg.batchSize
+    test_acc = train_acc.data.cpu().numpy()/test_size
+    test_loss = test_loss/test_size
+
+    logger.info("==> test loss:{}, test acc:{}".format(test_loss, test_acc))
+
+    x = list(range(len(test_loss_plot)))
+    plt.figure()
+    plt.plot(x, train_loss_plot, label="train loss")
+    plt.plot(x, test_loss_plot, label="test loss")
+    plt.legend()
+    plt.xlabel("epoch")
+    plt.ylabel("loss")
+    plt.title("dLSTM/dVGG Loss")
+    plt.savefig('dLSTM_loss.png')
+
+    x = list(range(len(test_acc_plot)))
+    plt.figure()
+    plt.plot(x, train_acc_plot, label="train accuracy")
+    plt.plot(x, test_acc_plot, label="test accuracy")
+    plt.legend()
+    plt.xlabel("epoch")
+    plt.ylabel("accuracy")
+    plt.title("dLSTM/dVGG Accuracy")
+    plt.savefig('dLSTM_accuracy.png')
 
 
 if __name__ == "__main__":
