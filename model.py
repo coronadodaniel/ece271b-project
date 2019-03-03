@@ -10,7 +10,7 @@ class dLSTM(nn.Module):
     def __init__(self, h_dim):
         super(dLSTM, self).__init__()
         
-        in_dim = 4096
+        in_dim = h_dim
         cat_dim = in_dim+(2*h_dim)        
         self.i = nn.Sequential(nn.Linear(cat_dim,h_dim), nn.Sigmoid())
         self.f = nn.Sequential(nn.Linear(cat_dim,h_dim), nn.Sigmoid())
@@ -36,14 +36,17 @@ class dVGG(nn.Module):
         self.model = models.vgg16(pretrained=True)
         self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-3])
         self.classifier = nn.Linear(h_dim,num_of_classes)
-        self.dLSTM = dLSTM(h_dim)
+        self.LSTM = nn.LSTM(4096,h_dim)
+        self.d1LSTM = dLSTM(h_dim)
         
-    def forward(self,x,h,dv,s):
+    def forward(self,x,hidden,h,dv,s):
         f = self.model(x)
-        h,dv,s = self.dLSTM(f,h,dv,s)
+        f = f.view(1,-1,4096)
+        out,hidden = self.LSTM(f,hidden)
+        h,dv,s = self.dLSTM(out,h,dv,s)
         y = self.classifier(h)
         #print('y',y.shape,'h', h.shape)
-        return y, h, dv, s
+        return y,hidden, h, dv, s
 
 class VGG(nn.Module):
     def __init__(self, h_dim,num_of_classes):
