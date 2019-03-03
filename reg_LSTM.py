@@ -107,7 +107,6 @@ def main():
     ##########################
     ##### Start Training #####
     ##########################
-    torch.no_grad() #####
     epochs = arg.epochs if arg.train_f else 0
     for epoch in range(epochs):
         model.train()
@@ -144,7 +143,7 @@ def main():
             train_acc = 100.0*train_acc.data.cpu().numpy()/arg.batchSize
             #print('train acc', train_acc, 'train loss', loss.data.cpu())
 
-            if batchIdx%100==0:
+            if batchIdx%50==0:
                 logger.info("epochs:{}, train loss:{}, train acc:{}".format(epoch, loss.data.cpu(), train_acc))
         
         ########################
@@ -178,7 +177,7 @@ def main():
             val_acc = 100.0*val_acc.data.cpu().numpy()/arg.batchSize
 
 
-        logger.info("==> val loss:{}, val acc:{}".format(val_acc,loss.data.cpu().numpy()))
+        logger.info("==> val loss:{}, val acc:{}".format(loss.data.cpu().numpy(),val_acc))
         
         if val_acc>min_acc:
             min_acc=val_acc
@@ -218,7 +217,7 @@ def main():
         test_acc += (pred == labelBatch.data).sum()
     test_acc = 100.0*test_acc.data.cpu().numpy()/testSize
     
-    logger.info("==> test loss:{}, test acc:{}".format(test_acc,loss.data.cpu().numpy()))
+    logger.info("==> test loss:{}, test acc:{}".format(loss.data.cpu().numpy(),test_acc))
 
 
 if __name__ == "__main__":
