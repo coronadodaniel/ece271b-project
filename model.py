@@ -39,15 +39,44 @@ class dVGG(nn.Module):
         self.classifier = nn.Linear(h_dim,num_of_classes)
         self.LSTM = nn.LSTM(4096,h_dim)
         self.dLSTM = dLSTM(h_dim)
+        self.h_dim=h_dim
         
-    def forward(self,x,hidden,h,dv,s):
+    def forward(self,x,(h0,c),h,dv,s):
         f = self.model(x)
         f = f.view(1,-1,4096)
+        hidden = (h0.view(1,-1,self.h_dim),c.view(1,-1,self.h_dim))
         out,hidden = self.LSTM(f,hidden)
         h,dv,s = self.dLSTM(out,h,dv,s)
         y = self.classifier(h)
+        (h0,c) = hidden
+        h0=h0.view(-1,self.h_dim)
+        c = c.view(-1,self.h_dim)
         #print('y',y.shape,'h', h.shape)
-        return y,hidden, h, dv, s
+        return y,(h0,c), h, dv, s
+    
+class dAlexNet(nn.Module):
+    def __init__(self, h_dim,num_of_classes):
+        super(dAlexNet, self).__init__()
+        
+        self.model = models.alexnet(pretrained=True)
+        self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-2])
+        self.classifier = nn.Linear(h_dim,num_of_classes)
+        self.LSTM = nn.LSTM(4096,h_dim)
+        self.dLSTM = dLSTM(h_dim)
+        self.h_dim=h_dim
+        
+    def forward(self,x,(h0,c),h,dv,s):
+        f = self.model(x)
+        f = f.view(1,-1,4096)
+        hidden = (h0.view(1,-1,self.h_dim),c.view(1,-1,self.h_dim))
+        out,hidden = self.LSTM(f,hidden)
+        h,dv,s = self.dLSTM(out,h,dv,s)
+        y = self.classifier(h)
+        (h0,c) = hidden
+        h0=h0.view(-1,self.h_dim)
+        c = c.view(-1,self.h_dim)
+        #print('y',y.shape,'h', h.shape)
+        return y,(h0,c), h, dv, s
 
 class VGG(nn.Module):
     def __init__(self, h_dim,num_of_classes):
@@ -55,6 +84,24 @@ class VGG(nn.Module):
         
         self.model = models.vgg16(pretrained=True)
         self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-3])
+        self.classifier = nn.Linear(h_dim,num_of_classes)
+        self.LSTM = nn.LSTM(4096,h_dim)
+        self.num_of_classes = num_of_classes
+        
+    def forward(self,x,hidden):
+        f = self.model(x)
+        f = f.view(1,-1,4096)
+        out,hidden = self.LSTM(f,hidden)
+        y = self.classifier(out)
+        y=y.view(-1,self.num_of_classes)
+        #print('y',y.shape,'h', h.shape)
+        return y, hidden
+class AlexNet(nn.Module):
+    def __init__(self, h_dim,num_of_classes):
+        super(AlexNet, self).__init__()
+        
+        self.model = models.alexnet(pretrained=True)
+        self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-2])
         self.classifier = nn.Linear(h_dim,num_of_classes)
         self.LSTM = nn.LSTM(4096,h_dim)
         self.num_of_classes = num_of_classes

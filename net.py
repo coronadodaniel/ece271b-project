@@ -17,8 +17,9 @@ import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
 
-from model import dVGG
+from model import dVGG, dAlexNet
 from DRLoader import DRLoader
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description='PyTorch Training')
 
@@ -30,8 +31,26 @@ parser.add_argument('--lr','--learning-rate',action='store',default=0.01, type=f
 parser.add_argument('--train_f', action='store_false', default=True, help='Flag to train (STORE_FALSE)(default: True)')
 parser.add_argument('--useGPU_f', action='store_false', default=True, help='Flag to use GPU (STORE_FALSE)(default: True)')
 parser.add_argument('--gpu_num','--list', type=int, nargs='+',help='gpu_num ',required=True)
+parser.add_argument("--net", default='dAlexNet', const='dAlexNet',nargs='?', choices=['dVGG', 'dAlexNet'], help="net model(default:VGG)")
+
 arg = parser.parse_args()
 
+def plot_grad_flow(named_parameters):
+    ave_grads = []
+    layers = []
+    for n, p in named_parameters:
+        if(p.requires_grad) and ("bias" not in n):
+            layers.append(n)
+            ave_grads.append(p.grad.abs().mean())
+    plt.plot(ave_grads, alpha=0.3, color="b")
+    plt.hlines(0, 0, len(ave_grads)+1, linewidth=1, color="k" )
+    plt.xticks(range(0,len(ave_grads), 1), layers, rotation="vertical")
+    plt.xlim(xmin=0, xmax=len(ave_grads))
+    plt.xlabel("Layers")
+    plt.ylabel("average gradient")
+    plt.title("Gradient flow")
+    plt.grid(True)
+    
 def main():
     if len(arg.gpu_num)==1:
         torch.cuda.set_device(arg.gpu_num[0])
@@ -40,11 +59,11 @@ def main():
         os.makedirs('model')
     if not os.path.exists('log'):
         os.makedirs('log')
-    model_path = 'model/model_dLSTM.pt'
+    model_path = 'model/model_dLSTM_'+str(arg.lr)+'_'+arg.net+'.pt'
     
     logger = logging.getLogger('netlog')
     logger.setLevel(logging.INFO)
-    ch = logging.FileHandler('log/logfile_dLSTM.log')
+    ch = logging.FileHandler('log/logfile_dLSTM_'+str(arg.lr)+'_'+arg.net+'.log')
     ch.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
@@ -55,6 +74,7 @@ def main():
     logger.info("Batch Size: {}".format(arg.batchSize))
     logger.info("Window Size: {}".format(arg.windowSize))
     logger.info("Hidden Layer Dimension: {}".format(arg.h_dim))
+    logger.info("GPU num: {}".format(arg.gpu_num))
     
     data_transforms = {
         'train': transforms.Compose([
@@ -76,15 +96,18 @@ def main():
     num_of_classes=11
     
     trainLoader = DRLoader(train_path, arg.windowSize, data_transforms['train'], True)
-    testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'], False)
+    testLoader = DRLoader(test_path, arg.windowSize, data_transforms['test'], True)
     trainSize = trainLoader.__len__()
     testSize = testLoader.__len__()
     
-    model = dVGG(arg.h_dim, num_of_classes)
+    if arg.net == 'dVGG':
+        model = dVGG(arg.h_dim, num_of_classes)
+    elif arg.net == 'dAlexNet':
+        model = dAlexNet(arg.h_dim, num_of_classes)
     
     if arg.useGPU_f:
         if len(arg.gpu_num)>1:
-            model = nn.DataParallel(model,arg.gpu_num)
+            model = nn.DataParallel(model,arg.gpu_num,dim=0)
         model.cuda()
     
     optimizer = optim.Adam(model.parameters(),lr=arg.lr)
@@ -95,14 +118,14 @@ def main():
         s=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
         h=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
         dv=Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False)
-        hidden = ( Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False),
-                   Variable(torch.randn(1,arg.batchSize,arg.h_dim).cuda(),requires_grad=False))
+        (h0,c) = ( Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False),
+                   Variable(torch.randn(arg.batchSize,arg.h_dim).cuda(),requires_grad=False))
     else:
         s=Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False)
         h=Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False)
         dv=Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False)
-        hidden = ( Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False),
-                   Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False))
+        (h0,c) = ( Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False),
+                   Variable(torch.randn(arg.batchSize,arg.h_dim),requires_grad=False))
      
     min_acc=0.0
     ##########################
@@ -126,9 +149,9 @@ def main():
             
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
-                (h0,c) = hidden
-                hidden = (h0.detach(), c.detach())
+                temp,(h0,c),h,dv,s = model(imgBatch,(h0,c),h,dv,s)
+                #(h0,c) = hidden
+                (h0,c) = (h0.detach(), c.detach())
                 h,dv,s = h.detach(), dv.detach(), s.detach()
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
@@ -138,6 +161,7 @@ def main():
             #loss = Variable(loss.cuda(),requires_grad=True)
             loss = criterion(Y,labelBatch)
             loss.backward()
+            #plot_grad_flow(model.named_parameters())
             optimizer.step()
             optimizer.zero_grad()
 
@@ -147,7 +171,7 @@ def main():
             #print('train acc', train_acc, 'train loss', loss.data.cpu())
 
             if batchIdx%100==0:
-                logger.info("epochs:{}, batchIdx:{}, train loss:{}, train acc:{}".format(epoch, batchIdx loss.data.cpu(), train_acc))
+                logger.info("epochs:{}, batchIdx:{}, train loss:{}, train acc:{}".format(epoch, batchIdx, loss.data.cpu(), train_acc))
         
         ########################
         ### Start Validation ###
@@ -157,17 +181,17 @@ def main():
         for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader.batches(arg.batchSize)):
             if arg.useGPU_f:
                 y=torch.zeros(arg.batchSize, num_of_classes).cuda()
-                windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
+                windowBatch = Variable(windowBatch.cuda(),requires_grad=False)
                 labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
             else:
                 y=torch.zeros(arg.batchSize, num_of_classes)
-                windowBatch = Variable(windowBatch,requires_grad=True)
+                windowBatch = Variable(windowBatch,requires_grad=False)
                 labelBatch = Variable(labelBatch,requires_grad=False)
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
-                (h0,c) = hidden
-                hidden = (h0.detach(), c.detach())
+                temp,(h0,c),h,dv,s = model(imgBatch,(h0,c),h,dv,s)
+                #(h0,c) = hidden
+                (h0,c) = (h0.detach(), c.detach())
                 h,dv,s = h.detach(), dv.detach(), s.detach()
                 #loss_ = criterion(temp,labelBatch)
                 #loss+=loss_.data
@@ -185,7 +209,7 @@ def main():
         if val_acc>min_acc:
             min_acc=val_acc
             torch.save(model.state_dict(), model_path)
-            
+    #plt.show()        
     ##########################
     ##### Start Testing #####
     ##########################   
@@ -199,18 +223,18 @@ def main():
         y=torch.zeros(arg.batchSize, num_of_classes)
         if arg.useGPU_f:
             y=torch.zeros(arg.batchSize, num_of_classes).cuda()
-            windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
+            windowBatch = Variable(windowBatch.cuda(),requires_grad=False)
             labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
         else:
             y=torch.zeros(arg.batchSize, num_of_classes)
-            windowBatch = Variable(windowBatch,requires_grad=True)
+            windowBatch = Variable(windowBatch,requires_grad=False)
             labelBatch = Variable(labelBatch,requires_grad=False)
         
         for i in range(arg.windowSize):
             imgBatch = windowBatch[:,i,:,:,:]
-            temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
-            (h0,c) = hidden
-            hidden = (h0.detach(), c.detach())
+            temp,(h0,c),h,dv,s = model(imgBatch,(h0,c),h,dv,s)
+            #(h0,c) = hidden
+            (h0,c) = (h0.detach(), c.detach())
             h,dv,s = h.detach(), dv.detach(), s.detach()
             #loss_ = criterion(temp,labelBatch)
             #loss+=loss_.data
