@@ -24,6 +24,8 @@ import matplotlib.pyplot as plt
 from model import dVGG
 from DRLoader import DRLoader
 
+plt.switch_backend('agg')
+
 imageio.plugins.ffmpeg.download()
 
 parser = argparse.ArgumentParser(description='PyTorch Training')
@@ -161,10 +163,14 @@ def main():
             if batchIdx%100==0:
                 logger.info("epochs:{}, iteration:{}/{}, train loss:{}".format(epoch, batchIdx, training_iters, loss.data.cpu()))
 
-        train_loss /= train_size
-        train_acc /= train_acc
+        train_loss = train_loss/train_size
+        train_acc =  train_acc.data.cpu().numpy()/train_size
+        print("train_acc = ",train_acc)
         train_loss_plot.append(train_loss)
-        train_acc_plot.append(train_plot)
+        train_acc_plot.append(train_acc)
+
+
+        print(train_acc_plot)
 
 
         ########################
@@ -194,13 +200,12 @@ def main():
             loss = criterion(Y,labelBatch)
             val_loss += loss.item()
             _,pred = torch.max(Y,1)
-            v_acc = (pred == labelBatch.data).sum()
+            val_acc += (pred == labelBatch.data).sum()
             #v_acc = v_acc.data.cpu().numpy()/arg.batchSize
             val_size += arg.batchSize
-            val_acc += v_acc
 
-        val_loss /= val_size
-        val_acc /= val_size
+        val_loss = val_loss/val_size
+        val_acc = val_acc.data.cpu().numpy()/val_size
         logger.info("==> val loss:{}, val acc:{}".format(val_loss, val_acc))
 
         test_loss_plot.append(val_loss)
@@ -222,7 +227,7 @@ def main():
 
     test_size = 0
     for batchIdx,(windowBatch,labelBatch) in enumerate(testLoader.batches(arg.batchSize)):
-        y=torch.zeros(arg.batchSize, num_of_classes)
+        y=torch.zeros(arg.batchSize, num_of_classes).cuda()
         if arg.useGPU_f:
             windowBatch = Variable(windowBatch.cuda(),requires_grad=True)
             labelBatch = Variable(labelBatch.cuda(),requires_grad=False)
@@ -243,30 +248,31 @@ def main():
         loss = criterion(Y,labelBatch)
         test_loss += loss.item()
         _,pred = torch.max(Y,1)
-        t_acc = (pred == labelBatch.data).sum()
+        test_acc += (pred == labelBatch.data).sum()
         #t_acc = t_acc.data.cpu().numpy()/arg.batchSize
-        test_acc += t_acc
         test_size += arg.batchSize
 
-    test_loss /= test_size
-    test_acc /= test_size
+    test_loss = test_loss/ test_size
+    test_acc =  test_acc.data.cpu().numpy()/test_size
     logger.info("==> test loss:{}, test acc:{}".format(test_loss,test_acc))
 
 
-    x = list(range(len(test_loss)))
+
+    x = list(range(len(test_loss_plot)))
+    print(x)
     plt.figure()
-    plt.plot(x, train_loss, label="train loss")
-    plt.plot(x, test_loss, label="test loss")
+    plt.plot(x, train_loss_plot, label="train loss")
+    plt.plot(x, test_loss_plot, label="test loss")
     plt.legend()
     plt.xlabel("epoch")
     plt.ylabel("loss")
     plt.title("dLSTM/dVGG Loss")
     plt.savefig('dLSTM_loss.png')
 
-    x = list(range(len(test_acc)))
+    x = list(range(len(test_acc_plot)))
     plt.figure()
-    plt.plot(x, train_acc, label="train accuracy")
-    plt.plot(x, test_acc, label="test accuracy")
+    plt.plot(x, train_acc_plot, label="train accuracy")
+    plt.plot(x, test_acc_plot, label="test accuracy")
     plt.legend()
     plt.xlabel("epoch")
     plt.ylabel("accuracy")
