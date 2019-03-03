@@ -126,7 +126,7 @@ def main():
             
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,h,dv,s = model(imgBatch,hidden,h,dv,s)
+                temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
                 (h0,c) = hidden
                 hidden = (h0.detach(), c.detach())
                 h,dv,s = h.detach(), dv.detach(), s.detach()
@@ -147,7 +147,7 @@ def main():
             #print('train acc', train_acc, 'train loss', loss.data.cpu())
 
             if batchIdx%100==0:
-                logger.info("epochs:{}, train loss:{}, train acc:{}".format(epoch, loss.data.cpu(), train_acc))
+                logger.info("epochs:{}, batchIdx:{}, train loss:{}, train acc:{}".format(epoch, batchIdx loss.data.cpu(), train_acc))
         
         ########################
         ### Start Validation ###
@@ -165,7 +165,7 @@ def main():
                 labelBatch = Variable(labelBatch,requires_grad=False)
             for i in range(arg.windowSize):
                 imgBatch = windowBatch[:,i,:,:,:]
-                temp,h,dv,s = model(imgBatch,hidden,h,dv,s)
+                temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
                 (h0,c) = hidden
                 hidden = (h0.detach(), c.detach())
                 h,dv,s = h.detach(), dv.detach(), s.detach()
@@ -208,7 +208,7 @@ def main():
         
         for i in range(arg.windowSize):
             imgBatch = windowBatch[:,i,:,:,:]
-            temp,h,dv,s = model(imgBatch,hidden,h,dv,s)
+            temp,hidden,h,dv,s = model(imgBatch,hidden,h,dv,s)
             (h0,c) = hidden
             hidden = (h0.detach(), c.detach())
             h,dv,s = h.detach(), dv.detach(), s.detach()

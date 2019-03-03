@@ -16,9 +16,10 @@ class dLSTM(nn.Module):
         self.f = nn.Sequential(nn.Linear(cat_dim,h_dim), nn.Sigmoid())
         self.o = nn.Sequential(nn.Linear(cat_dim,h_dim), nn.Sigmoid())
         self.g = nn.Sequential(nn.Linear(in_dim+h_dim,h_dim), nn.Tanh())
+        self.h_dim = h_dim
         
     def forward(self,x,h,dv,s):
-        #print(x.shape, h.shape, dv.shape)
+        x=x.view(-1,self.h_dim)
         i = self.i(torch.cat([x,h,dv],1))
         f = self.f(torch.cat([x,h,dv],1))
         g = self.g(torch.cat([x,h],1))
@@ -37,7 +38,7 @@ class dVGG(nn.Module):
         self.model.classifier = nn.Sequential(*list(self.model.classifier.children())[:-3])
         self.classifier = nn.Linear(h_dim,num_of_classes)
         self.LSTM = nn.LSTM(4096,h_dim)
-        self.d1LSTM = dLSTM(h_dim)
+        self.dLSTM = dLSTM(h_dim)
         
     def forward(self,x,hidden,h,dv,s):
         f = self.model(x)
