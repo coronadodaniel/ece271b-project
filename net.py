@@ -203,7 +203,7 @@ def main():
             val_acc += (pred == labelBatch.data).sum()
             
         val_acc = 100.0*val_acc.data.cpu().numpy()/testSize
-        logger.info("==> val loss:{}, val acc:{}".format(val_acc,loss.data.cpu().numpy()))
+        logger.info("==> val loss:{}, val acc:{}".format(loss.data.cpu().numpy(),val_acc))
         
         if val_acc>min_acc:
             min_acc=val_acc
@@ -243,9 +243,9 @@ def main():
         loss = criterion(Y,labelBatch)
         _,pred = torch.max(y,1)
         test_acc += (pred == labelBatch.data).sum()
-    test_acc = 100.0*train_acc.data.cpu().numpy()/testSize
+    test_acc = 100.0*test_acc.data.cpu().numpy()/testSize
     
-    logger.info("==> test loss:{}, test acc:{}".format(test_acc,loss.data.cpu().numpy()))
+    logger.info("==> test loss:{}, test acc:{}".format(loss.data.cpu().numpy(),test_acc))
 
 
 if __name__ == "__main__":
