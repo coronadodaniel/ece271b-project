@@ -131,7 +131,6 @@ def main():
     ##########################
     ##### Start Training #####
     ##########################
-    torch.no_grad() #####
     epochs = arg.epochs if arg.train_f else 0
     for epoch in range(epochs):
         model.train()
