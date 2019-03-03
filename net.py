@@ -165,12 +165,10 @@ def main():
 
         train_loss = train_loss/train_size
         train_acc =  train_acc.data.cpu().numpy()/train_size
-        print("train_acc = ",train_acc)
         train_loss_plot.append(train_loss)
         train_acc_plot.append(train_acc)
 
 
-        print(train_acc_plot)
 
 
         ########################
@@ -259,7 +257,6 @@ def main():
 
 
     x = list(range(len(test_loss_plot)))
-    print(x)
     plt.figure()
     plt.plot(x, train_loss_plot, label="train loss")
     plt.plot(x, test_loss_plot, label="test loss")

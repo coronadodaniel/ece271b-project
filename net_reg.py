@@ -104,6 +104,11 @@ def main():
         h = Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False)
         c = Variable(torch.randn(1,arg.batchSize,arg.h_dim),requires_grad=False)
 
+    train_acc_plot = []
+    train_loss_plot = []
+    test_acc_plot = []
+    test_loss_plot = []
+
     min_acc=0.0
     ##########################
     ##### Start Training #####
@@ -115,6 +120,9 @@ def main():
     for epoch in range(epochs):
         model.train()
         optimizer.zero_grad()
+        train_size = 0
+        train_loss = 0
+        train_acc = 0
         for batchIdx,(windowBatch,labelBatch) in enumerate(trainLoader.batches(arg.batchSize)):
             loss=0.0
             y=torch.zeros(arg.batchSize, num_of_classes).cuda()
@@ -138,16 +146,24 @@ def main():
             #loss = Variable(loss.cuda(),requires_grad=True)
             loss = criterion(Y, labelBatch)
             loss.backward(retain_graph=True)
+            train_loss += loss.item()
             #loss.backward()
             optimizer.step()
             optimizer.zero_grad()
 
             _,pred = torch.max(Y,1) ### prediction should after averging the array
-            train_acc = (pred == labelBatch.data).sum()
-            train_acc = train_acc.data.cpu().numpy()/arg.batchSize
+            train_acc += (pred == labelBatch.data).sum()
+            #train_acc = train_acc.data.cpu().numpy()/arg.batchSize
+            train_size += arg.batchSize
 
             if batchIdx%100==0:
                 logger.info("epochs:{}, iteration:{}/{}, train loss:{}".format(epoch, batchIdx, training_iters, loss.data.cpu()))
+
+        train_loss = train_loss/train_size
+        train_acc = train_acc.data.cpu().numpy() / train_size
+
+        train_loss_plot.append(train_loss)
+        train_acc_plot.append(train_acc)
 
         ########################
         ### Start Validation ###
@@ -185,6 +201,8 @@ def main():
         val_loss /= val_size
         val_acc /= val_size
         logger.info("==> val loss:{}, val acc:{}".format(val_loss, val_acc))
+        test_loss_plot.append(val_loss)
+        test_acc_plot.append(val_acc)
 
         if val_acc>min_acc:
             min_acc=val_acc
@@ -233,6 +251,28 @@ def main():
     test_loss /= test_size
     test_acc /= test_size
     logger.info("==> test loss:{}, test acc:{}".format(test_loss,test_acc))
+
+
+    x = list(range(len(test_loss_plot)))
+    plt.figure()
+    plt.plot(x, train_loss_plot, label="train loss")
+    plt.plot(x, test_loss_plot, label="test loss")
+    plt.legend()
+    plt.xlabel("epoch")
+    plt.ylabel("loss")
+    plt.title("dLSTM/dVGG Loss")
+    plt.savefig('dLSTM_loss.png')
+
+    x = list(range(len(test_acc_plot)))
+    plt.figure()
+    plt.plot(x, train_acc_plot, label="train accuracy")
+    plt.plot(x, test_acc_plot, label="test accuracy")
+    plt.legend()
+    plt.xlabel("epoch")
+    plt.ylabel("accuracy")
+    plt.title("dLSTM/dVGG Accuracy")
+    plt.savefig('dLSTM_accuracy.png')
+
 
 if __name__ == "__main__":
     main()
