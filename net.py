@@ -253,7 +253,7 @@ def main():
         _,pred = torch.max(y,1)
         test_acc += (pred == labelBatch.data).sum()
         test_size += arg.batchSize
-    test_acc = train_acc.data.cpu().numpy()/test_size
+    test_acc = test_acc.data.cpu().numpy()/test_size
     test_loss = test_loss/test_size
 
     logger.info("==> test loss:{}, test acc:{}".format(test_loss, test_acc))
