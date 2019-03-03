@@ -139,7 +139,10 @@ def main():
     ##########################
     ##### Start Training #####
     ##########################
+<<<<<<< HEAD
     
+=======
+>>>>>>> f7b0252b8d7e920c839bd938c621dbcc99201e9b
     epochs = arg.epochs if arg.train_f else 0
     for epoch in range(epochs):
         model.train()
