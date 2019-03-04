@@ -1,0 +1,27 @@
+2019-03-03 00:46:19,721 - netlog - INFO - ================================================
+2019-03-03 00:46:19,721 - netlog - INFO - Learning Rate: 0.001
+2019-03-03 00:46:19,721 - netlog - INFO - Nbr of Epochs: 20
+2019-03-03 00:46:19,721 - netlog - INFO - Batch Size: 16
+2019-03-03 00:46:19,721 - netlog - INFO - Window Size: 10
+2019-03-03 00:46:19,721 - netlog - INFO - Hidden Layer Dimension: 64
+2019-03-03 00:46:36,376 - netlog - INFO - epochs:0, train loss:2.48676228523, train acc:0.0
+2019-03-03 00:59:18,989 - netlog - INFO - ==> val loss:18.75, val acc:2.37945151329
+2019-03-03 00:59:28,739 - netlog - INFO - epochs:1, train loss:2.30119276047, train acc:25.0
+2019-03-03 01:11:58,821 - netlog - INFO - ==> val loss:12.5, val acc:2.36714220047
+2019-03-03 01:12:05,637 - netlog - INFO - epochs:2, train loss:2.31360530853, train acc:18.75
+2019-03-03 01:24:37,727 - netlog - INFO - ==> val loss:12.5, val acc:2.36284899712
+2019-03-03 01:24:44,917 - netlog - INFO - epochs:3, train loss:2.31836271286, train acc:18.75
+2019-03-03 01:37:13,191 - netlog - INFO - ==> val loss:12.5, val acc:2.3607943058
+2019-03-03 01:37:20,038 - netlog - INFO - epochs:4, train loss:2.32136774063, train acc:18.75
+2019-03-03 01:49:37,705 - netlog - INFO - ==> val loss:12.5, val acc:2.35946369171
+2019-03-03 01:49:43,895 - netlog - INFO - epochs:5, train loss:2.32395172119, train acc:18.75
+2019-03-03 02:00:43,269 - netlog - INFO - ==> val loss:12.5, val acc:2.35842943192
+2019-03-03 02:00:49,691 - netlog - INFO - epochs:6, train loss:2.32638883591, train acc:18.75
+2019-03-03 02:12:14,301 - netlog - INFO - ==> val loss:12.5, val acc:2.35756611824
+2019-03-03 02:12:20,437 - netlog - INFO - epochs:7, train loss:2.32873249054, train acc:18.75
+2019-03-03 02:23:33,648 - netlog - INFO - ==> val loss:18.75, val acc:2.35683012009
+2019-03-03 02:23:40,022 - netlog - INFO - epochs:8, train loss:2.33099246025, train acc:18.75
+2019-03-03 02:35:12,581 - netlog - INFO - ==> val loss:18.75, val acc:2.35619950294
+2019-03-03 02:35:18,764 - netlog - INFO - epochs:9, train loss:2.33316898346, train acc:18.75
+2019-03-03 02:46:59,757 - netlog - INFO - ==> val loss:18.75, val acc:2.35566067696
+2019-03-03 02:47:06,092 - netlog - INFO - epochs:10, train loss:2.33526325226, train acc:18.75

@@ -1,0 +1,48 @@
+2019-03-03 02:50:59,401 - netlog - INFO - ================================================
+2019-03-03 02:50:59,402 - netlog - INFO - Learning Rate: 1e-06
+2019-03-03 02:50:59,402 - netlog - INFO - Nbr of Epochs: 20
+2019-03-03 02:50:59,402 - netlog - INFO - Batch Size: 16
+2019-03-03 02:50:59,402 - netlog - INFO - Window Size: 10
+2019-03-03 02:50:59,402 - netlog - INFO - Hidden Layer Dimension: 64
+2019-03-03 02:50:59,402 - netlog - INFO - GPU num: 2
+2019-03-03 02:51:14,721 - netlog - INFO - epochs:0, train loss:2.41854453087, train acc:12.5
+2019-03-03 03:01:42,938 - netlog - INFO - ==> val loss:6.25, val acc:2.38208913803
+2019-03-03 03:01:51,999 - netlog - INFO - epochs:1, train loss:2.33193898201, train acc:25.0
+2019-03-03 03:12:46,675 - netlog - INFO - ==> val loss:0.0, val acc:2.39191746712
+2019-03-03 03:12:53,519 - netlog - INFO - epochs:2, train loss:2.34708309174, train acc:18.75
+2019-03-03 03:23:41,504 - netlog - INFO - ==> val loss:0.0, val acc:2.37014579773
+2019-03-03 03:23:48,706 - netlog - INFO - epochs:3, train loss:2.3060529232, train acc:0.0
+2019-03-03 03:34:37,802 - netlog - INFO - ==> val loss:12.5, val acc:2.34550285339
+2019-03-03 03:34:47,789 - netlog - INFO - epochs:4, train loss:2.29869890213, train acc:18.75
+2019-03-03 03:45:44,840 - netlog - INFO - ==> val loss:12.5, val acc:2.35508346558
+2019-03-03 03:45:51,878 - netlog - INFO - epochs:5, train loss:2.33379912376, train acc:25.0
+2019-03-03 03:56:44,988 - netlog - INFO - ==> val loss:6.25, val acc:2.27785348892
+2019-03-03 03:56:52,630 - netlog - INFO - epochs:6, train loss:2.25731873512, train acc:18.75
+2019-03-03 04:07:25,925 - netlog - INFO - ==> val loss:6.25, val acc:2.3690161705
+2019-03-03 04:07:32,674 - netlog - INFO - epochs:7, train loss:2.27917146683, train acc:18.75
+2019-03-03 04:18:13,668 - netlog - INFO - ==> val loss:18.75, val acc:2.30193758011
+2019-03-03 04:18:23,250 - netlog - INFO - epochs:8, train loss:2.18939471245, train acc:25.0
+2019-03-03 04:29:29,450 - netlog - INFO - ==> val loss:6.25, val acc:2.28202843666
+2019-03-03 04:29:36,251 - netlog - INFO - epochs:9, train loss:2.17257523537, train acc:43.75
+2019-03-03 04:40:43,521 - netlog - INFO - ==> val loss:18.75, val acc:2.2206735611
+2019-03-03 04:40:50,566 - netlog - INFO - epochs:10, train loss:2.22586369514, train acc:56.25
+2019-03-03 04:52:00,441 - netlog - INFO - ==> val loss:37.5, val acc:2.17568421364
+2019-03-03 04:52:10,273 - netlog - INFO - epochs:11, train loss:2.23539543152, train acc:31.25
+2019-03-03 05:03:16,842 - netlog - INFO - ==> val loss:37.5, val acc:2.18763613701
+2019-03-03 05:03:23,754 - netlog - INFO - epochs:12, train loss:2.21545147896, train acc:31.25
+2019-03-03 05:14:22,501 - netlog - INFO - ==> val loss:37.5, val acc:2.18335342407
+2019-03-03 05:14:29,804 - netlog - INFO - epochs:13, train loss:2.12305855751, train acc:37.5
+2019-03-03 05:25:41,669 - netlog - INFO - ==> val loss:31.25, val acc:2.19320845604
+2019-03-03 05:25:48,886 - netlog - INFO - epochs:14, train loss:2.14997506142, train acc:50.0
+2019-03-03 05:37:26,743 - netlog - INFO - ==> val loss:43.75, val acc:2.22643494606
+2019-03-03 05:37:37,041 - netlog - INFO - epochs:15, train loss:2.0784778595, train acc:56.25
+2019-03-03 05:49:09,561 - netlog - INFO - ==> val loss:43.75, val acc:2.15474128723
+2019-03-03 05:49:16,809 - netlog - INFO - epochs:16, train loss:2.10963368416, train acc:43.75
+2019-03-03 06:00:50,932 - netlog - INFO - ==> val loss:37.5, val acc:2.18984818459
+2019-03-03 06:00:57,849 - netlog - INFO - epochs:17, train loss:2.16633987427, train acc:43.75
+2019-03-03 06:12:32,490 - netlog - INFO - ==> val loss:56.25, val acc:2.09358882904
+2019-03-03 06:12:42,207 - netlog - INFO - epochs:18, train loss:2.0563762188, train acc:37.5
+2019-03-03 06:24:17,239 - netlog - INFO - ==> val loss:25.0, val acc:2.17144393921
+2019-03-03 06:24:24,255 - netlog - INFO - epochs:19, train loss:2.06639289856, train acc:56.25
+2019-03-03 06:36:03,741 - netlog - INFO - ==> val loss:56.25, val acc:2.0557103157
+2019-03-03 06:39:33,112 - netlog - INFO - ==> test loss:47.7707006369, test acc:2.17526578903

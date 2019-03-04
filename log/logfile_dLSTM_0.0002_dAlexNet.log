@@ -1,0 +1,71 @@
+2019-03-03 00:19:46,622 - netlog - INFO - ================================================
+2019-03-03 00:19:46,623 - netlog - INFO - Learning Rate: 0.0002
+2019-03-03 00:19:46,623 - netlog - INFO - Nbr of Epochs: 20
+2019-03-03 00:19:46,623 - netlog - INFO - Batch Size: 32
+2019-03-03 00:19:46,623 - netlog - INFO - Window Size: 10
+2019-03-03 00:19:46,623 - netlog - INFO - Hidden Layer Dimension: 64
+2019-03-03 00:20:06,153 - netlog - INFO - epochs:0, batchIdx:0, train loss:2.40699672699, train acc:3.125
+2019-03-03 00:31:03,050 - netlog - INFO - ==> val loss:38.2165605096, val acc:2.3916079998
+2019-03-03 00:31:18,712 - netlog - INFO - epochs:1, batchIdx:0, train loss:2.28459882736, train acc:56.25
+2019-03-03 00:38:28,443 - netlog - INFO - ================================================
+2019-03-03 00:38:28,443 - netlog - INFO - Learning Rate: 0.0002
+2019-03-03 00:38:28,443 - netlog - INFO - Nbr of Epochs: 20
+2019-03-03 00:38:28,443 - netlog - INFO - Batch Size: 32
+2019-03-03 00:38:28,443 - netlog - INFO - Window Size: 10
+2019-03-03 00:38:28,443 - netlog - INFO - Hidden Layer Dimension: 64
+2019-03-03 00:38:49,858 - netlog - INFO - epochs:0, batchIdx:0, train loss:2.39601111412, train acc:12.5
+2019-03-03 00:50:16,529 - netlog - INFO - ==> val loss:37.1549893843, val acc:2.28568816185
+2019-03-03 00:50:33,614 - netlog - INFO - epochs:1, batchIdx:0, train loss:2.25085067749, train acc:46.875
+2019-03-03 01:01:55,370 - netlog - INFO - ==> val loss:54.7770700637, val acc:2.14258933067
+2019-03-03 01:02:13,249 - netlog - INFO - epochs:2, batchIdx:0, train loss:2.04730534554, train acc:68.75
+2019-03-03 01:13:35,646 - netlog - INFO - ==> val loss:54.7770700637, val acc:1.97294163704
+2019-03-03 01:13:50,100 - netlog - INFO - epochs:3, batchIdx:0, train loss:1.77057552338, train acc:68.75
+2019-03-03 01:25:12,533 - netlog - INFO - ==> val loss:50.1061571125, val acc:1.80852842331
+2019-03-03 01:25:26,900 - netlog - INFO - epochs:4, batchIdx:0, train loss:1.41939949989, train acc:68.75
+2019-03-03 01:36:46,368 - netlog - INFO - ==> val loss:56.2632696391, val acc:1.69477045536
+2019-03-03 01:37:03,934 - netlog - INFO - epochs:5, batchIdx:0, train loss:1.11803340912, train acc:81.25
+2019-03-03 01:48:25,416 - netlog - INFO - ==> val loss:62.4203821656, val acc:1.43557333946
+2019-03-03 01:48:42,762 - netlog - INFO - epochs:6, batchIdx:0, train loss:0.853939950466, train acc:90.625
+2019-03-03 02:00:03,290 - netlog - INFO - ==> val loss:60.7218683652, val acc:1.42434978485
+2019-03-03 02:00:17,594 - netlog - INFO - epochs:7, batchIdx:0, train loss:0.789669632912, train acc:87.5
+2019-03-03 02:11:37,961 - netlog - INFO - ==> val loss:62.8450106157, val acc:1.53720211983
+2019-03-03 02:11:55,829 - netlog - INFO - epochs:8, batchIdx:0, train loss:0.559331357479, train acc:90.625
+2019-03-03 02:23:17,603 - netlog - INFO - ==> val loss:62.6326963907, val acc:1.61869931221
+2019-03-03 02:23:32,290 - netlog - INFO - epochs:9, batchIdx:0, train loss:0.393988698721, train acc:96.875
+2019-03-03 02:34:52,040 - netlog - INFO - ==> val loss:63.906581741, val acc:1.64103198051
+2019-03-03 02:35:09,428 - netlog - INFO - epochs:10, batchIdx:0, train loss:0.344928979874, train acc:96.875
+2019-03-03 02:46:30,997 - netlog - INFO - ==> val loss:63.6942675159, val acc:1.47056555748
+2019-03-03 02:46:45,171 - netlog - INFO - epochs:11, batchIdx:0, train loss:0.262221306562, train acc:100.0
+2019-03-03 02:58:07,136 - netlog - INFO - ==> val loss:66.2420382166, val acc:1.5207234621
+2019-03-03 02:58:24,523 - netlog - INFO - epochs:12, batchIdx:0, train loss:0.197939157486, train acc:100.0
+2019-03-03 03:09:47,263 - netlog - INFO - ==> val loss:65.1804670913, val acc:1.51584136486
+2019-03-03 03:10:01,721 - netlog - INFO - epochs:13, batchIdx:0, train loss:0.200556755066, train acc:100.0
+2019-03-03 03:21:21,741 - netlog - INFO - ==> val loss:60.7218683652, val acc:2.06802368164
+2019-03-03 03:21:35,959 - netlog - INFO - epochs:14, batchIdx:0, train loss:0.134371399879, train acc:100.0
+2019-03-03 03:32:55,941 - netlog - INFO - ==> val loss:66.0297239915, val acc:1.32609665394
+2019-03-03 03:33:10,495 - netlog - INFO - epochs:15, batchIdx:0, train loss:0.233307927847, train acc:96.875
+2019-03-03 03:44:33,104 - netlog - INFO - ==> val loss:65.6050955414, val acc:1.62854480743
+2019-03-03 03:44:47,435 - netlog - INFO - epochs:16, batchIdx:0, train loss:0.109113462269, train acc:100.0
+2019-03-03 14:51:49,558 - netlog - INFO - ================================================
+2019-03-03 14:58:37,844 - netlog - INFO - 2nd order peek hole LSTM
+2019-03-03 14:58:37,844 - netlog - INFO - Learning Rate: 0.0002
+2019-03-03 14:58:37,844 - netlog - INFO - Nbr of Epochs: 20
+2019-03-03 14:58:37,844 - netlog - INFO - Batch Size: 64
+2019-03-03 14:58:37,844 - netlog - INFO - Window Size: 10
+2019-03-03 14:58:37,844 - netlog - INFO - Hidden Layer Dimension: 128
+2019-03-03 14:58:37,844 - netlog - INFO - GPU num: [1]
+2019-03-03 14:59:12,981 - netlog - INFO - epochs:0, batchIdx:0, train loss:2.38372802734, train acc:20.3125
+2019-03-03 15:10:43,583 - netlog - INFO - ==> val loss:2.31390166283, val acc:23.1422505308
+2019-03-03 15:11:15,223 - netlog - INFO - epochs:1, batchIdx:0, train loss:2.28373003006, train acc:37.5
+2019-03-03 15:23:12,624 - netlog - INFO - ==> val loss:2.16097712517, val acc:44.3736730361
+2019-03-03 15:23:48,324 - netlog - INFO - epochs:2, batchIdx:0, train loss:2.10147285461, train acc:60.9375
+2019-03-03 15:36:26,039 - netlog - INFO - ==> val loss:1.82902789116, val acc:50.1061571125
+2019-03-03 15:37:00,404 - netlog - INFO - epochs:3, batchIdx:0, train loss:1.7298926115, train acc:73.4375
+2019-03-03 15:49:31,238 - netlog - INFO - ==> val loss:1.45927929878, val acc:50.5307855626
+2019-03-03 15:50:05,473 - netlog - INFO - epochs:4, batchIdx:0, train loss:1.26782464981, train acc:71.875
+2019-03-03 16:02:55,537 - netlog - INFO - ==> val loss:1.21362376213, val acc:55.2016985138
+2019-03-03 16:03:31,253 - netlog - INFO - epochs:5, batchIdx:0, train loss:0.950626969337, train acc:78.125
+2019-03-03 16:16:09,894 - netlog - INFO - ==> val loss:1.18201267719, val acc:56.9002123142
+2019-03-03 16:16:43,972 - netlog - INFO - epochs:6, batchIdx:0, train loss:0.68333119154, train acc:90.625
+2019-03-03 16:29:04,564 - netlog - INFO - ==> val loss:0.950523555279, val acc:59.0233545648
+2019-03-03 16:29:38,366 - netlog - INFO - epochs:7, batchIdx:0, train loss:0.462097406387, train acc:93.75

@@ -1,0 +1,17 @@
+2019-03-02 22:52:23,269 - netlog - INFO - ================================================
+2019-03-02 22:52:23,269 - netlog - INFO - Learning Rate: 2e-05
+2019-03-02 22:52:23,269 - netlog - INFO - Nbr of Epochs: 20
+2019-03-02 22:52:23,269 - netlog - INFO - Batch Size: 5
+2019-03-02 22:52:23,269 - netlog - INFO - Window Size: 12
+2019-03-02 22:52:23,269 - netlog - INFO - Hidden Layer Dimension: 64
+2019-03-02 22:52:35,499 - netlog - INFO - epochs:0, batchIdx:0, train loss:2.40001296997, train acc:0.0
+2019-03-02 22:57:25,315 - netlog - INFO - epochs:0, batchIdx:100, train loss:2.27889299393, train acc:40.0
+2019-03-02 23:02:15,556 - netlog - INFO - epochs:0, batchIdx:200, train loss:2.29269552231, train acc:40.0
+2019-03-02 23:06:55,478 - netlog - INFO - ==> val loss:69.2144373673, val acc:2.354637146
+2019-03-02 23:08:13,555 - netlog - INFO - ================================================
+2019-03-02 23:08:13,555 - netlog - INFO - Learning Rate: 2e-05
+2019-03-02 23:08:13,555 - netlog - INFO - Nbr of Epochs: 20
+2019-03-02 23:08:13,555 - netlog - INFO - Batch Size: 8
+2019-03-02 23:08:13,555 - netlog - INFO - Window Size: 12
+2019-03-02 23:08:13,556 - netlog - INFO - Hidden Layer Dimension: 64
+2019-03-02 23:08:27,545 - netlog - INFO - epochs:0, batchIdx:0, train loss:2.44197058678, train acc:12.5

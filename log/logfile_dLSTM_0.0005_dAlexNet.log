@@ -1,0 +1,20 @@
+2019-03-03 13:39:22,281 - netlog - INFO - ================================================
+2019-03-03 13:39:22,281 - netlog - INFO - PEAK HOLE LSTM, 2nd derivative
+2019-03-03 13:39:22,281 - netlog - INFO - Learning Rate: 0.0005
+2019-03-03 13:39:22,281 - netlog - INFO - Nbr of Epochs: 20
+2019-03-03 13:39:22,281 - netlog - INFO - Batch Size: 32
+2019-03-03 13:39:22,281 - netlog - INFO - Window Size: 10
+2019-03-03 13:39:22,281 - netlog - INFO - Hidden Layer Dimension: 128
+2019-03-03 13:39:22,281 - netlog - INFO - GPU num: [1]
+2019-03-03 13:39:43,296 - netlog - INFO - epochs:0, batchIdx:0, train loss:2.39111614227, train acc:18.75
+2019-03-03 13:51:26,919 - netlog - INFO - ==> val loss:2.39751720428, val acc:9.55414012739
+2019-03-03 13:51:43,904 - netlog - INFO - epochs:1, batchIdx:0, train loss:2.38105988503, train acc:9.375
+2019-03-03 14:03:29,199 - netlog - INFO - ==> val loss:2.39938902855, val acc:10.6157112527
+2019-03-03 14:03:46,747 - netlog - INFO - epochs:2, batchIdx:0, train loss:2.37829256058, train acc:18.75
+2019-03-03 14:15:33,229 - netlog - INFO - ==> val loss:2.40009665489, val acc:9.76645435244
+2019-03-03 14:15:47,769 - netlog - INFO - epochs:3, batchIdx:0, train loss:2.3777089119, train acc:18.75
+2019-03-03 14:27:33,295 - netlog - INFO - ==> val loss:2.40240693092, val acc:9.76645435244
+2019-03-03 14:27:47,613 - netlog - INFO - epochs:4, batchIdx:0, train loss:2.37629318237, train acc:15.625
+2019-03-03 14:39:22,825 - netlog - INFO - ==> val loss:2.40493607521, val acc:9.76645435244
+2019-03-03 14:39:37,023 - netlog - INFO - epochs:5, batchIdx:0, train loss:2.37513184547, train acc:18.75
+2019-03-03 14:51:12,967 - netlog - INFO - ==> val loss:2.40920448303, val acc:9.76645435244

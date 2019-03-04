@@ -1,0 +1,6 @@
+2019-03-02 23:18:22,958 - netlog - INFO - ================================================
+2019-03-02 23:18:22,958 - netlog - INFO - Learning Rate: 0.01
+2019-03-02 23:18:22,958 - netlog - INFO - Nbr of Epochs: 20
+2019-03-02 23:18:22,958 - netlog - INFO - Batch Size: 16
+2019-03-02 23:18:22,958 - netlog - INFO - Window Size: 12
+2019-03-02 23:18:22,959 - netlog - INFO - Hidden Layer Dimension: 64
