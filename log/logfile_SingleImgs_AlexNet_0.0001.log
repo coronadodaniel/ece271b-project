@@ -1,0 +1,57 @@
+2019-03-16 01:06:26,917 - netlog - INFO - ================================================
+2019-03-16 01:06:26,917 - netlog - INFO - Learning Rate: 0.0001
+2019-03-16 01:06:26,917 - netlog - INFO - Classifier: AlexNet
+2019-03-16 01:06:26,917 - netlog - INFO - Nbr of Epochs: 10
+2019-03-16 01:06:50,546 - netlog - INFO - Start Training
+2019-03-16 01:06:51,386 - netlog - INFO - ==>>> epoch:0, batch index: 0, train loss:2.664488554, label accuracy:4.6875
+2019-03-16 01:06:52,516 - netlog - INFO - ==>>> epoch:0, batch index: 10, train loss:1.17417478561, label accuracy:60.9375
+2019-03-16 01:06:53,652 - netlog - INFO - ==>>> epoch:0, batch index: 20, train loss:0.567278981209, label accuracy:84.375
+2019-03-16 01:06:54,785 - netlog - INFO - ==>>> epoch:0, batch index: 30, train loss:0.729741096497, label accuracy:71.875
+2019-03-16 01:06:59,364 - netlog - INFO - ==>>> Val loss:1.64115422543, accuracy:70.4496788009
+2019-03-16 01:07:00,132 - netlog - INFO - ==>>> epoch:1, batch index: 0, train loss:0.171052366495, label accuracy:98.4375
+2019-03-16 01:07:01,264 - netlog - INFO - ==>>> epoch:1, batch index: 10, train loss:0.149281710386, label accuracy:93.75
+2019-03-16 01:07:02,437 - netlog - INFO - ==>>> epoch:1, batch index: 20, train loss:0.0979684069753, label accuracy:98.4375
+2019-03-16 01:07:03,575 - netlog - INFO - ==>>> epoch:1, batch index: 30, train loss:0.0438941791654, label accuracy:100.0
+2019-03-16 01:07:05,489 - netlog - INFO - ==>>> Val loss:2.08391200919, accuracy:69.164882227
+2019-03-16 01:07:06,134 - netlog - INFO - ==>>> epoch:2, batch index: 0, train loss:0.011205047369, label accuracy:100.0
+2019-03-16 01:07:07,277 - netlog - INFO - ==>>> epoch:2, batch index: 10, train loss:0.0521773397923, label accuracy:96.875
+2019-03-16 01:07:08,409 - netlog - INFO - ==>>> epoch:2, batch index: 20, train loss:0.0587991923094, label accuracy:98.4375
+2019-03-16 01:07:09,547 - netlog - INFO - ==>>> epoch:2, batch index: 30, train loss:0.0147256925702, label accuracy:100.0
+2019-03-16 01:07:14,315 - netlog - INFO - ==>>> Val loss:1.76136087331, accuracy:75.374732334
+2019-03-16 01:07:15,111 - netlog - INFO - ==>>> epoch:3, batch index: 0, train loss:0.0111439302564, label accuracy:100.0
+2019-03-16 01:07:16,245 - netlog - INFO - ==>>> epoch:3, batch index: 10, train loss:0.00701849907637, label accuracy:100.0
+2019-03-16 01:07:17,385 - netlog - INFO - ==>>> epoch:3, batch index: 20, train loss:0.00332894176245, label accuracy:100.0
+2019-03-16 01:07:18,520 - netlog - INFO - ==>>> epoch:3, batch index: 30, train loss:0.0128612071276, label accuracy:100.0
+2019-03-16 01:07:20,532 - netlog - INFO - ==>>> Val loss:2.00310070108, accuracy:72.591006424
+2019-03-16 01:07:21,167 - netlog - INFO - ==>>> epoch:4, batch index: 0, train loss:0.0169504359365, label accuracy:100.0
+2019-03-16 01:07:22,306 - netlog - INFO - ==>>> epoch:4, batch index: 10, train loss:0.063856177032, label accuracy:98.4375
+2019-03-16 01:07:23,468 - netlog - INFO - ==>>> epoch:4, batch index: 20, train loss:0.00500395894051, label accuracy:100.0
+2019-03-16 01:07:24,606 - netlog - INFO - ==>>> epoch:4, batch index: 30, train loss:0.0068568661809, label accuracy:100.0
+2019-03-16 01:07:26,499 - netlog - INFO - ==>>> Val loss:2.384677298, accuracy:69.9143468951
+2019-03-16 01:07:27,153 - netlog - INFO - ==>>> epoch:5, batch index: 0, train loss:0.0230595134199, label accuracy:98.4375
+2019-03-16 01:07:28,313 - netlog - INFO - ==>>> epoch:5, batch index: 10, train loss:0.0578423440456, label accuracy:95.3125
+2019-03-16 01:07:29,462 - netlog - INFO - ==>>> epoch:5, batch index: 20, train loss:0.00765956938267, label accuracy:100.0
+2019-03-16 01:07:30,603 - netlog - INFO - ==>>> epoch:5, batch index: 30, train loss:0.0154532715678, label accuracy:100.0
+2019-03-16 01:07:32,468 - netlog - INFO - ==>>> Val loss:1.89690256144, accuracy:74.7323340471
+2019-03-16 01:07:33,102 - netlog - INFO - ==>>> epoch:6, batch index: 0, train loss:0.00714605301619, label accuracy:100.0
+2019-03-16 01:07:34,234 - netlog - INFO - ==>>> epoch:6, batch index: 10, train loss:0.0196413844824, label accuracy:100.0
+2019-03-16 01:07:35,399 - netlog - INFO - ==>>> epoch:6, batch index: 20, train loss:0.0262032002211, label accuracy:98.4375
+2019-03-16 01:07:36,556 - netlog - INFO - ==>>> epoch:6, batch index: 30, train loss:0.00283565372229, label accuracy:100.0
+2019-03-16 01:07:38,385 - netlog - INFO - ==>>> Val loss:2.10495266816, accuracy:72.1627408994
+2019-03-16 01:07:38,966 - netlog - INFO - ==>>> epoch:7, batch index: 0, train loss:0.0169987604022, label accuracy:98.4375
+2019-03-16 01:07:39,683 - netlog - INFO - ==>>> epoch:7, batch index: 10, train loss:0.00975950807333, label accuracy:100.0
+2019-03-16 01:07:40,716 - netlog - INFO - ==>>> epoch:7, batch index: 20, train loss:0.00630740821362, label accuracy:100.0
+2019-03-16 01:07:41,315 - netlog - INFO - ==>>> epoch:7, batch index: 30, train loss:0.0116728320718, label accuracy:100.0
+2019-03-16 01:07:43,092 - netlog - INFO - ==>>> Val loss:2.55942536514, accuracy:70.6638115632
+2019-03-16 01:07:43,802 - netlog - INFO - ==>>> epoch:8, batch index: 0, train loss:0.0300432816148, label accuracy:98.4375
+2019-03-16 01:07:44,717 - netlog - INFO - ==>>> epoch:8, batch index: 10, train loss:0.0208567157388, label accuracy:100.0
+2019-03-16 01:07:45,303 - netlog - INFO - ==>>> epoch:8, batch index: 20, train loss:0.0053828433156, label accuracy:100.0
+2019-03-16 01:07:45,889 - netlog - INFO - ==>>> epoch:8, batch index: 30, train loss:0.00121204555035, label accuracy:100.0
+2019-03-16 01:07:47,557 - netlog - INFO - ==>>> Val loss:2.06972521668, accuracy:72.8051391863
+2019-03-16 01:07:48,136 - netlog - INFO - ==>>> epoch:9, batch index: 0, train loss:0.0475214496255, label accuracy:98.4375
+2019-03-16 01:07:48,738 - netlog - INFO - ==>>> epoch:9, batch index: 10, train loss:0.0110733732581, label accuracy:100.0
+2019-03-16 01:07:49,377 - netlog - INFO - ==>>> epoch:9, batch index: 20, train loss:0.000835984945297, label accuracy:100.0
+2019-03-16 01:07:49,960 - netlog - INFO - ==>>> epoch:9, batch index: 30, train loss:0.0124536603689, label accuracy:100.0
+2019-03-16 01:07:51,780 - netlog - INFO - ==>>> Val loss:2.32872021418, accuracy:73.3404710921
+2019-03-16 01:07:51,780 - netlog - INFO - Start Testing for Best Model
+2019-03-16 01:07:53,233 - netlog - INFO - ==>>> Val loss:1.76136087331, accuracy:75.374732334

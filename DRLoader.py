@@ -5,6 +5,7 @@ from tqdm import tqdm
 import numpy as np
 import random
 import torch
+from torch.utils.data import Dataset
 
 class DRLoader:
     def __init__(self,root_dir, window_size, transforms, shuffle_f):
@@ -67,3 +68,23 @@ class DRLoader:
                 x[indx] = Window
             
             yield x,y
+            
+class DSLoader(Dataset):
+    def __init__(self, data, transform):
+        self.transform = transform
+        imgs = data['imgs']
+        labels = data['labels']      
+        self.images = np.array(imgs)
+        self.id_labels = np.array(labels)
+    
+    def __len__(self):
+        return len(self.images)
+        
+    def __getitem__(self, idx):
+        
+        image = self.images[idx]
+        ID = self.id_labels[idx]
+        if self.transform:
+            image = self.transform(Image.fromarray(image))
+
+        return image, ID
