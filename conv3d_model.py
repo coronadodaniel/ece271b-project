@@ -100,7 +100,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, sample_size, sample_duration, shortcut_type='B', num_classes=11, last_fc=True):
+    def __init__(self, block, layers, sample_size, sample_duration, shortcut_type='B', num_classes=11, last_fc=True, img_size=224):
         self.last_fc = last_fc
 
         self.inplanes = 64
@@ -114,13 +114,16 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], shortcut_type, stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], shortcut_type, stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], shortcut_type, stride=2)
-        print(sample_size,sample_duration)
+        #print("smaple size sample duration = ",sample_size,sample_duration)
         last_duration = int(math.ceil(sample_duration / 16))
         last_size = int(math.ceil(sample_size / 32))
-        print(last_duration,last_size)
+        #print("lastduraction, last_size = ",last_duration,last_size)
         last_size = 1
         self.avgpool = nn.AvgPool3d((last_duration, last_size, last_size), stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+
+        # convolutions and avgpool divide original img size in 2, 5 times
+        fc_size_inp = int((img_size/ (2**5))**2)
+        self.fc = nn.Linear(512 * fc_size_inp, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -153,22 +156,23 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        #print(x.shape)
         x = self.conv1(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
 
         x = self.layer1(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.layer2(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.layer3(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.layer4(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.avgpool(x)
-        print(x.shape)
+        #print(x.shape)
 
         x = x.view(x.size(0), -1)
         if self.last_fc:

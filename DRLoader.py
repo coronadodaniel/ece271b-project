@@ -12,7 +12,7 @@ class DRLoader:
         assert os.path.exists(root_dir), root_dir+' not exists'
         self.window_size = window_size
         self.transforms = transforms
-        
+
         classes = sorted(os.listdir(root_dir))
         vid_path,labels=[],[]
         for i,c in enumerate(classes):
@@ -23,21 +23,21 @@ class DRLoader:
                     continue
                 vid_path.append(os.path.join(root_dir,c,vid))
                 labels.append(i)
-                
+
         self.videos = vid_path
         self.labels = labels
-        
+
         if shuffle_f:
             self.shuffle()
-        
+
     def shuffle(self):
-        z = zip(self.videos, self.labels)
+        z = list(zip(self.videos, self.labels))
         random.shuffle(z)
         self.videos, self.labels = [list(l) for l in zip(*z)]
-        
+
     def __len__(self):
         return len(self.videos)
-    
+
     def batches(self,batchsize):
         n = len(self.videos)
         for i in range(0,n-batchsize,batchsize):
@@ -66,22 +66,22 @@ class DRLoader:
                     else:
                         Window=torch.cat([Window,img],0)
                 x[indx] = Window
-            
+
             yield x,y
-            
+
 class DSLoader(Dataset):
     def __init__(self, data, transform):
         self.transform = transform
         imgs = data['imgs']
-        labels = data['labels']      
+        labels = data['labels']
         self.images = np.array(imgs)
         self.id_labels = np.array(labels)
-    
+
     def __len__(self):
         return len(self.images)
-        
+
     def __getitem__(self, idx):
-        
+
         image = self.images[idx]
         ID = self.id_labels[idx]
         if self.transform:
